@@ -1,11 +1,11 @@
 {% extends "generic/object_list.html" %}
 
-{% comment %} {% block createbutton %}
+{% block createbutton %}
     <a href="{% url "misterx:game-create" %}" class="btn btn-success">
         <i class="ti ti-plus me-2"></i>
-        Create new Host
+        Create new Game
     </a>
-{% endblock createbutton %} {% endcomment %}
+{% endblock createbutton %}
 
 {% block page-title %}
     Games

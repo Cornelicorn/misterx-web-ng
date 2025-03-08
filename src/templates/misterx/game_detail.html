@@ -1,0 +1,36 @@
+{% extends "generic/object_detail.html" %}
+
+{% block page-pretitle %}
+    Game Detail
+{% endblock page-pretitle %}
+
+{% block object_buttons %}
+    <a href="{% url "misterx:game-edit" object.id %}" class="btn btn-warning">Edit</a>
+    <a href="{% url "misterx:game-delete" object.id %}" class="btn btn-danger">Delete</a>
+{% endblock object_buttons %}
+
+{% block specific_content %}
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <strong>Zone information</strong>
+            </h3>
+        </div>
+        <div class="card-body">
+            <div class="datagrid">
+                <div class="datagrid-item">
+                    <div class="datagrid-title">Name</div>
+                    <div class="datagrid-content">{{ object.name }}</div>
+                </div>
+                <div class="datagrid-item">
+                    <div class="datagrid-title">Date</div>
+                    <div class="datagrid-content">{{ object.date }}</div>
+                </div>
+                <div class="datagrid-item">
+                    <div class="datagrid-title">Active</div>
+                    <div class="datagrid-content">{{ object.active | yesno }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock specific_content %}
