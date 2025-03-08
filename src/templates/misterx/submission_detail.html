@@ -1,0 +1,52 @@
+{% extends "generic/object_detail.html" %}
+
+{% block page-pretitle %}
+    Game Detail
+{% endblock page-pretitle %}
+
+{% block object_buttons %}
+    <a href="{% url "misterx:submission-edit" object.id %}" class="btn btn-warning">Edit</a>
+    <a href="{% url "misterx:submission-delete" object.id %}" class="btn btn-danger">Delete</a>
+{% endblock object_buttons %}
+
+{% block specific_content %}
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <strong>Submission information</strong>
+            </h3>
+        </div>
+        <div class="card-body">
+            <div class="datagrid">
+                <div class="datagrid-item">
+                    <div class="datagrid-title">Group</div>
+                    <div class="datagrid-content">{{ object.group }}</div>
+                </div>
+                <div class="datagrid-item">
+                    <div class="datagrid-title">Task</div>
+                    <div class="datagrid-content">{{ object.task }}</div>
+                </div>
+                <div class="datagrid-item">
+                    <div class="datagrid-title">Game</div>
+                    <div class="datagrid-content">{{ object.game }}</div>
+                </div>
+                <div class="datagrid-item">
+                    <div class="datagrid-title">Time</div>
+                    <div class="datagrid-content">{{ object.time }}</div>
+                </div>
+                <div class="datagrid-item">
+                    <div class="datagrid-title">Accepted</div>
+                    <div class="datagrid-content">{{ object.accepted | yesno:"Yes,No,Not yet reviewed" }}</div>
+                </div>
+                <div class="datagrid-item">
+                    <div class="datagrid-title">Points overriden</div>
+                    <div class="datagrid-content">{{ object.points_override | yesno:"Yes,Yes,No" }}</div>
+                </div>
+                <div class="datagrid-item">
+                    <div class="datagrid-title">Granted points</div>
+                    <div class="datagrid-content">{{ object.granted_points }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock specific_content %}

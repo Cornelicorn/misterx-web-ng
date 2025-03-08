@@ -1,0 +1,12 @@
+{% extends "generic/object_list.html" %}
+
+{% block createbutton %}
+    <a href="{% url "misterx:task-create" %}" class="btn btn-success">
+        <i class="ti ti-plus me-2"></i>
+        Create new Task
+    </a>
+{% endblock createbutton %}
+
+{% block page-title %}
+    Tasks
+{% endblock page-title %}

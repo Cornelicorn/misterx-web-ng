@@ -83,9 +83,17 @@ class Submission(models.Model):
     group = models.ForeignKey(PlayerGroup, related_name="submissions", on_delete=models.CASCADE)
     game = models.ForeignKey(Game, related_name="submissions", on_delete=models.CASCADE)
     task = models.ForeignKey(Task, related_name="submissions", on_delete=models.CASCADE)
-    time = models.DateTimeField(_("Time of submission"), auto_now=True)
-    accepted = models.BooleanField(_("Whether the solution was accepted"), null=True, blank=True, default=None)
-    points_override = models.PositiveIntegerField(_("Override number of granted points"), null=True, blank=True, default=None)
+    time = models.DateTimeField(_("Time"), help_text=_("Time of submission"), auto_now=True)
+    accepted = models.BooleanField(
+        _("Accepted"), help_text=_("Whether the solution was accepted"), null=True, blank=True, default=None
+    )
+    points_override = models.PositiveIntegerField(
+        _("Granted points"),
+        help_text="Override the number of points the group will receive for this submission",
+        null=True,
+        blank=True,
+        default=None,
+    )
     explanation = models.TextField(
         _("Explanation"), help_text=_("Further explanations you might want to add"), null=True, blank=True
     )

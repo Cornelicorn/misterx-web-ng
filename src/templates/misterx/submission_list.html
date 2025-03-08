@@ -1,0 +1,12 @@
+{% extends "generic/object_list.html" %}
+
+{% block createbutton %}
+    <a href="{% url "misterx:submission-create" %}" class="btn btn-success">
+        <i class="ti ti-plus me-2"></i>
+        Create new Submission
+    </a>
+{% endblock createbutton %}
+
+{% block page-title %}
+    Submission
+{% endblock page-title %}

@@ -1,0 +1,12 @@
+{% extends "generic/object_list.html" %}
+
+{% block createbutton %}
+    <a href="{% url "misterx:playergroup-create" %}" class="btn btn-success">
+        <i class="ti ti-plus me-2"></i>
+        Create new Playergroup
+    </a>
+{% endblock createbutton %}
+
+{% block page-title %}
+    Playergroups
+{% endblock page-title %}

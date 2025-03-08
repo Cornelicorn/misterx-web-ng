@@ -38,6 +38,22 @@
                                {% if request.resolver_match.url_name == 'game-list' %}active" aria-current="true{% endif %}">
                         <a href="{% url "misterx:game-list" %}" class="nav-link">Games List</a>
                     </li>
+                    <li class="nav-item
+                               {% if request.resolver_match.url_name == 'task-list' %}active" aria-current="true{% endif %}">
+                        <a href="{% url "misterx:task-list" %}" class="nav-link">Tasks List</a>
+                    </li>
+                    <li class="nav-item
+                               {% if request.resolver_match.url_name == 'submission-list' %}active" aria-current="true{% endif %}">
+                        <a href="{% url "misterx:submission-list" %}" class="nav-link">Submissions List</a>
+                    </li>
+                    <li class="nav-item
+                               {% if request.resolver_match.url_name == 'player-list' %}active" aria-current="true{% endif %}">
+                        <a href="{% url "misterx:player-list" %}" class="nav-link">Players List</a>
+                    </li>
+                    <li class="nav-item
+                               {% if request.resolver_match.url_name == 'playergroup-list' %}active" aria-current="true{% endif %}">
+                        <a href="{% url "misterx:playergroup-list" %}" class="nav-link">Playergroup List</a>
+                    </li>
                 </ul>
             </div>
 
