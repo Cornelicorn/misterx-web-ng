@@ -9,12 +9,15 @@ from django.utils.translation import gettext_lazy as _
 
 User = get_user_model()
 
+
 def get_default_game_name() -> str:
     return _("Mister X {date}").format(date=date.today().isoformat())
+
 
 class Player(User):
     class Meta:
         proxy = True
+
 
 class PlayerGroup(Group):
     class Meta:
@@ -33,17 +36,16 @@ class Task(models.Model):
         return reverse("misterx:task-detail", kwargs={"pk": self.id})
 
     def has_been_completed(self, game: "Game") -> bool:
-        if game.completed_tasks.filter(task=self, accepted=True).count():
+        if game.submissions.filter(task=self, accepted=True).count():
             return True
         else:
             return False
 
     def completed_by_group(self, game: "Game", group: PlayerGroup) -> bool:
-        if game.completed_tasks.filter(task=self, accepted=True, group=group).count():
+        if game.submissions.filter(task=self, accepted=True, group=group).count():
             return True
         else:
             return False
-
 
 
 class Game(models.Model):
@@ -54,7 +56,9 @@ class Game(models.Model):
     active = models.BooleanField(
         _("Active"),
         default=False,
-        help_text=_("Whether this game is active. Only one game can be active at the same time, setting this will override the value of the currently active model"),
+        help_text=_(
+            "Whether this game is active. Only one game can be active at the same time, setting this will override the value of the currently active model"
+        ),
     )
 
     def __str__(self) -> str:
@@ -62,7 +66,6 @@ class Game(models.Model):
 
     def get_absolute_url(self):
         return reverse("misterx:game-detail", kwargs={"pk": self.id})
-
 
     class Meta:
         ordering = ["-date"]
@@ -83,7 +86,9 @@ class Submission(models.Model):
     time = models.DateTimeField(_("Time of submission"), auto_now=True)
     accepted = models.BooleanField(_("Whether the solution was accepted"), null=True, blank=True, default=None)
     points_override = models.PositiveIntegerField(_("Override number of granted points"), null=True, blank=True, default=None)
-    explanation = models.TextField(_("Explanation"), help_text=_("Further explanations you might want to add"), null=True, blank=True)
+    explanation = models.TextField(
+        _("Explanation"), help_text=_("Further explanations you might want to add"), null=True, blank=True
+    )
 
     @property
     def granted_points(self) -> int:
