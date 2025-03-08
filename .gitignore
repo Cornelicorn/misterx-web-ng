@@ -1,0 +1,5 @@
+/src/db.sqlite3
+/src/static
+/src/misterx_root/local_settings.py
+*.py[oc]
+*.mo

@@ -1,0 +1,47 @@
+{% extends "base/layout.html" %}
+
+{% load i18n %}
+
+{% block content %}
+    {% with id_filter_modal="id_filter_modal" %}
+        <header class="page-header">
+            <div class="row align-items-center">
+                <div class="col">
+                    <div class="page-pretitle">
+
+                        {% block page-pretitle %}
+                            {% trans "List" %}
+                        {% endblock page-pretitle %}
+
+                    </div>
+                    <h1 class="page-title">
+
+                        {% block page-title %}
+                        {% endblock page-title %}
+
+                    </h1>
+                    <h2 class="text-muted">
+
+                        {% block page-subtitle %}
+                        {% endblock page-subtitle %}
+
+                    </h2>
+                </div>
+                <div class="col-auto pull-right">
+                    {% include "tables/filter_button.html" %}
+
+                    {% block extra_button %}
+                    {% endblock extra_button %}
+
+                    {% block createbutton %}
+                    {% endblock createbutton %}
+
+                </div>
+            </div>
+        </header>
+        <hr>
+        <main class="page-body">
+            {% include "tables/table_card.html" %}
+        </main>
+    {% endwith %}
+{% endblock content %}

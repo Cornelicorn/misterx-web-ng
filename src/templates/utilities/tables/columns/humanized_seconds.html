@@ -1,0 +1,7 @@
+{% load utilities_humanization %}
+
+{% if value %}
+    {{ value | humanize_seconds }}
+{% else %}
+    {{ value }}
+{% endif %}

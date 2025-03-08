@@ -1,0 +1,17 @@
+{% extends "generic/object_detail.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block page-title %}
+    {{ form.helper.title }}
+{% endblock page-title %}
+
+{% block page-pretitle %}
+    Edit
+{% endblock page-pretitle %}
+
+{% block specific_content %}
+    <div class="card">
+        <div class="card-body">{% crispy form form.helper %}</div>
+    </div>
+{% endblock specific_content %}

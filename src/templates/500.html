@@ -1,0 +1,13 @@
+{% extends "base/error_400.html" %}
+
+{% block status_code %}
+    500
+{% endblock status_code %}
+
+{% block error_title %}
+    Internal Server error
+{% endblock error_title %}
+
+{% block error_subtitle %}
+    The server is having a problem loading this page.
+{% endblock error_subtitle %}

@@ -1,0 +1,18 @@
+{% extends "base/base.html" %}
+
+{% block body %}
+    <div class="antialiased">
+        <div class="page">
+            {% include "base/navbar.html" %}
+            <div class="content">
+                <div class="container">
+                    <br>
+
+                    {% block content %}
+                    {% endblock content %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock body %}

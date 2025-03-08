@@ -1,0 +1,24 @@
+{% extends "generic/object_detail.html" %}
+
+{% block page-pretitle %}
+    Delete
+{% endblock page-pretitle %}
+
+{% block specific_content %}
+    <div class="alert alert-important alert-danger">
+
+        <form method="post">
+            {% csrf_token %}
+            <p>
+                You are about to delete
+                <br>
+                <strong>{{ object }}</strong>
+                <br>
+                Are you sure you want to do this?
+            </p>
+            <a href="{{ object.get_absolute_url }}" class="btn btn-light">Cancel</a>
+            <input class="btn btn-danger" role="button" type="submit" value="Confirm">
+        </form>
+
+    </div>
+{% endblock specific_content %}

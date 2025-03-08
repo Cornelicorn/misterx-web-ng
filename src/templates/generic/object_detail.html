@@ -1,0 +1,37 @@
+{% extends "base/layout.html" %}
+
+{% block content %}
+    <header class="page-header">
+        <div class="row">
+            <div class="col">
+                <div class="page-pretitle">
+
+                    {% block page-pretitle %}
+                        Detail
+                    {% endblock page-pretitle %}
+
+                </div>
+                <h1 class="page-title">
+
+                    {% block page-title %}
+                        {{ object }}
+                    {% endblock page-title %}
+
+                </h1>
+            </div>
+            <div class="col-auto pull-right">
+
+                {% block object_buttons %}
+                {% endblock object_buttons %}
+
+            </div>
+        </div>
+    </header>
+    <hr>
+    <main class="page-body">
+
+        {% block specific_content %}
+        {% endblock specific_content %}
+
+    </main>
+{% endblock content %}

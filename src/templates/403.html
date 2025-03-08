@@ -1,0 +1,13 @@
+{% extends "base/error_400.html" %}
+
+{% block status_code %}
+    403
+{% endblock status_code %}
+
+{% block error_title %}
+    Forbidden
+{% endblock error_title %}
+
+{% block error_subtitle %}
+    You are not allowed to access the requested resource.
+{% endblock error_subtitle %}

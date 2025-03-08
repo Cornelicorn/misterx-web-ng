@@ -1,0 +1,10 @@
+{% load i18n %}
+
+{% if filter %}
+    <button class="btn btn-primary my-2"
+            data-bs-toggle="modal"
+            data-bs-target="#{{ id_filter_modal }}">
+        <i class="ti ti-search me-2"></i>
+        {% trans "Filter" %}
+    </button>
+{% endif %}

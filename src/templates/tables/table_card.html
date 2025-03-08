@@ -1,0 +1,16 @@
+{% load i18n %}
+{% load render_table from django_tables2 %}
+
+{% include "tables/filter_modal.html" %}
+
+{% if table.paginated_rows %}
+    <div class="card">
+
+        {% block specific_content %}
+            {% render_table table %}
+        {% endblock specific_content %}
+
+    </div>
+{% else %}
+    <div class="container-xl my-auto">{% include "tables/table_empty.html" %}</div>
+{% endif %}

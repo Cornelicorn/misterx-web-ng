@@ -1,0 +1,35 @@
+{% extends "base/base.html" %}
+
+{% block body %}
+    <div class="page page-center">
+        <div class="container-tight py-4">
+            <div class="empty">
+                <div class="empty-header">
+
+                    {% block status_code %}
+                    {% endblock status_code %}
+
+                </div>
+                <p class="empty-title">
+
+                    {% block error_title %}
+                    {% endblock error_title %}
+
+                </p>
+                <p class="empty-subtitle text-muted">
+
+                    {% block error_subtitle %}
+                    {% endblock error_subtitle %}
+
+                </p>
+                <div class="empty-action">
+
+                    {% block action %}
+                        <a class="btn btn-primary" onclick="javascript:history.back();">Take me back</a>
+                    {% endblock action %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock body %}
