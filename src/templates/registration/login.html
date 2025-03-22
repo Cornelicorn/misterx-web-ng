@@ -8,16 +8,20 @@
         <div class="container container-tight py-5">
             {% if next %}
                 {% if user.is_authenticated %}
-                    <div class="alert alert-important alert-danger">
-                        <h4 class="alert-title">Insufficient permissions.</h4>
-                        <div class="text-muted">
-                            Your account doesn't have access to this page. To proceed,
-                            please login with an account that has access.
+                    <div class="card">
+                        <div class="alert alert-important alert-danger mb-0">
+                            <h4 class="alert-title">Insufficient permissions.</h4>
+                            <div class="text-muted">
+                                Your account doesn't have access to this page. To proceed,
+                                please login with an account that has access.
+                            </div>
                         </div>
                     </div>
                 {% else %}
-                    <div class="alert alert-important alert-warning">
-                        <h4 class="alert-title">Please login to see this page.</h4>
+                    <div class="card">
+                        <div class="alert alert-important alert-warning mb-0">
+                            <h4 class="alert-title">Please login to see this page.</h4>
+                        </div>
                     </div>
                 {% endif %}
             {% endif %}
