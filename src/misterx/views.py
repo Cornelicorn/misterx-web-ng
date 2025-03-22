@@ -1,8 +1,10 @@
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
+from django.views.generic import DeleteView, DetailView, UpdateView
 from django_filters.views import FilterView
 from django_tables2 import MultiTableMixin, SingleTableMixin
 from guardian.mixins import LoginRequiredMixin, PermissionListMixin, PermissionRequiredMixin
+
+from utilities.views import InitialCreateView
 
 from .filters import GameFilter, PlayerFilter, PlayerGroupFilter, SubmissionFilter, TaskFilter
 from .forms import GameForm, PlayerForm, PlayerGroupForm, SubmissionForm, TaskForm
@@ -18,7 +20,7 @@ class GameListView(LoginRequiredMixin, PermissionListMixin, SingleTableMixin, Fi
     filterset_class = GameFilter
 
 
-class GameCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+class GameCreateView(LoginRequiredMixin, PermissionRequiredMixin, InitialCreateView):
     model = Game
     permission_required = "mister.add_game"
     permission_object = None
@@ -66,7 +68,7 @@ class TaskListView(LoginRequiredMixin, PermissionListMixin, SingleTableMixin, Fi
     filterset_class = TaskFilter
 
 
-class TaskCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+class TaskCreateView(LoginRequiredMixin, PermissionRequiredMixin, InitialCreateView):
     model = Task
     permission_required = "mister.add_task"
     permission_object = None
@@ -113,7 +115,7 @@ class SubmissionListView(LoginRequiredMixin, PermissionListMixin, SingleTableMix
     filterset_class = SubmissionFilter
 
 
-class SubmissionCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+class SubmissionCreateView(LoginRequiredMixin, PermissionRequiredMixin, InitialCreateView):
     model = Submission
     permission_required = "mister.add_submission"
     permission_object = None
@@ -163,7 +165,7 @@ class PlayerListView(LoginRequiredMixin, PermissionListMixin, SingleTableMixin, 
     filterset_class = PlayerFilter
 
 
-class PlayerCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+class PlayerCreateView(LoginRequiredMixin, PermissionRequiredMixin, InitialCreateView):
     model = Player
     permission_required = "mister.add_player"
     permission_object = None
@@ -210,7 +212,7 @@ class PlayerGroupListView(LoginRequiredMixin, PermissionListMixin, SingleTableMi
     filterset_class = PlayerGroupFilter
 
 
-class PlayerGroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+class PlayerGroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, InitialCreateView):
     model = PlayerGroup
     permission_required = "mister.add_playergroup"
     permission_object = None
