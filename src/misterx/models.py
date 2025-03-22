@@ -2,8 +2,9 @@ from datetime import date
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
+from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import UniqueConstraint
+from django.db.models import Count, UniqueConstraint
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
@@ -84,13 +85,23 @@ class Game(models.Model):
             )
         ]
 
+    def clean(self):
+        error_dict = {}
+        if duplicates := self.groups.values_list("user").annotate(occurences=Count("id")).exclude(occurences=1):
+            error_dict["groups"] = _("These users are present in multiple groups: {users}").format(
+                users=", ".join(str(Player.objects.get(pk=id)) for id, _ in duplicates)
+            )
+        if error_dict:
+            raise ValidationError(error_dict)
+        return super().clean()
+
 
 class Submission(models.Model):
     group = models.ForeignKey(PlayerGroup, related_name="submissions", on_delete=models.CASCADE)
     game = models.ForeignKey(Game, related_name="submissions", on_delete=models.CASCADE)
     task = models.ForeignKey(Task, related_name="submissions", on_delete=models.CASCADE)
     time = models.DateTimeField(_("Time"), help_text=_("Time of submission"), auto_now=True)
-    submitter = models.ForeignKey(Player, related_name="submissions",  null=True, on_delete=models.SET_NULL)
+    submitter = models.ForeignKey(Player, related_name="submissions", null=True, on_delete=models.SET_NULL)
     accepted = models.BooleanField(
         _("Accepted"), help_text=_("Whether the solution was accepted"), null=True, blank=True, default=None
     )
@@ -119,6 +130,18 @@ class Submission(models.Model):
 
     def get_absolute_url(self):
         return reverse("misterx:submission-detail", kwargs={"pk": self.id})
+
+    def clean(self):
+        error_dict = {}
+        if self.task not in self.game.tasks.all():
+            error_dict["task"] = _("The selected task is not chosen in the selected game")
+        if self.group not in self.game.groups.all():
+            error_dict["group"] = _("The selected group is not playing in the selected game")
+        if self.submitter and self.group not in self.submitter.groups.all():
+            error_dict["submitter"] = _("The selected submitter is not part of the selected group")
+        if error_dict:
+            raise ValidationError(error_dict)
+        return super().clean()
 
     class Meta:
         indexes = [

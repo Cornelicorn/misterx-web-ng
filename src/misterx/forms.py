@@ -1,6 +1,8 @@
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 from django import forms
+from django.core.exceptions import ValidationError
+from django.db.models import Count
 from django.utils.translation import gettext_lazy as _
 
 from .models import Game, Player, PlayerGroup, Submission, Task
@@ -92,6 +94,16 @@ class PlayerForm(forms.ModelForm):
             "is_active",
             "groups",
         ]
+
+    def clean_groups(self):
+        data = self.cleaned_data["groups"]
+        if duplicates := data.values_list("games").annotate(occurences=Count("id")).exclude(occurences=1):
+            raise ValidationError(
+                _("The selected groups conflict in these games: {games}").format(
+                    games=", ".join(str(Game.objects.get(pk=id)) for id, _ in duplicates)
+                )
+            )
+        return data
 
 
 class PlayerGroupForm(forms.ModelForm):
