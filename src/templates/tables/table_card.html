@@ -4,13 +4,31 @@
 {% include "tables/filter_modal.html" %}
 
 {% if table.paginated_rows %}
-    <div class="card">
+    <div class="card mb-4">
+        {% if table_heading %}
+            <div class="card-header">
+                <h{{ heading_size | default:"2" }} class="card-title">{{ table_heading }}</h{{ heading_size | default:"2" }}>
+                <div class="card-actions">
+                    {% include "tables/filter_button.html" %}
+                </div>
+            </div>
+        {% endif %}
 
-        {% block specific_content %}
-            {% render_table table %}
-        {% endblock specific_content %}
+        {% render_table table %}
 
     </div>
 {% else %}
-    <div class="container-xl my-auto">{% include "tables/table_empty.html" %}</div>
+    {% if table_heading %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h{{ heading_size | default:"2" }} class="card-title">{{ table_heading }}</h{{ heading_size | default:"2" }}>
+                <div class="card-actions">
+                    {% include "tables/filter_button.html" %}
+                </div>
+            </div>
+            <div class="container-xl my-auto">{% include "tables/table_empty.html" %}</div>
+        </div>
+    {% else %}
+        <div class="container-xl my-auto">{% include "tables/table_empty.html" %}</div>
+    {% endif %}
 {% endif %}

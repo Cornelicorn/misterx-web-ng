@@ -18,10 +18,16 @@ class Player(User):
     class Meta:
         proxy = True
 
+    def get_absolute_url(self):
+        return reverse("misterx:player-detail", kwargs={"pk": self.id})
+
 
 class PlayerGroup(Group):
     class Meta:
         proxy = True
+
+    def get_absolute_url(self):
+        return reverse("misterx:playergroup-detail", kwargs={"pk": self.id})
 
 
 class Task(models.Model):

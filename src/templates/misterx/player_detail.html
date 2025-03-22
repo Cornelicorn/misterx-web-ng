@@ -1,5 +1,7 @@
 {% extends "generic/object_detail.html" %}
 
+{% load i18n %}
+
 {% block page-pretitle %}
     Player Detail
 {% endblock page-pretitle %}
@@ -10,11 +12,11 @@
 {% endblock object_buttons %}
 
 {% block specific_content %}
-    <div class="card">
+    <div class="card mb-4">
         <div class="card-header">
-            <h3 class="card-title">
+            <h2 class="card-title">
                 <strong>Player information</strong>
-            </h3>
+            </h2>
         </div>
         <div class="card-body">
             <div class="datagrid">
@@ -37,4 +39,15 @@
             </div>
         </div>
     </div>
+
+    {% trans "No Groups assigned to the player yet." as empty_title %}
+    {% trans "Assign Groups by editing this player." as empty_subtitle %}
+    {% trans "Groups" as table_heading %}
+    {% include "tables/table_card.html" with table=tables.0 filter=filters.0 id_filter_modal="id_filter_groups" %}
+
+    {% trans "This player doesn't participate in any games." as empty_title %}
+    {% trans "Assign one of the groups above to a game to add this player." as empty_subtitle %}
+    {% trans "Games" as table_heading %}
+    {% include "tables/table_card.html" with table=tables.1 filter=filters.1 id_filter_modal="id_filter_games" %}
+
 {% endblock specific_content %}

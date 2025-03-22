@@ -1,22 +1,13 @@
 {% load i18n %}
 
+{% trans "There is nothing to show here." as default_empty_title %}
+{% trans "Try adjusting the filters or create an entry." as default_empty_subtitle %}
+
 <div class="empty">
 
     {% block empty_table %}
-        <p class="empty-tile">
-
-            {% block empty_title %}
-                {% trans "There is nothing to show here." %}
-            {% endblock empty_title %}
-
-        </p>
-        <p class="empty-subtitle text-secondary">
-
-            {% block empty_subtitle %}
-                {% trans "Try adjusting the filters or create an entry." %}
-            {% endblock empty_subtitle %}
-
-        </p>
+        <p class="empty-tile">{{ empty_title | default:default_empty_title }}</p>
+        <p class="empty-subtitle text-secondary">{{ empty_subtitle | default:default_empty_subtitle }}</p>
         <div class="empty-action">
 
             {% block empty_action %}

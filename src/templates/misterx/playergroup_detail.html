@@ -1,5 +1,7 @@
 {% extends "generic/object_detail.html" %}
 
+{% load i18n %}
+
 {% block page-pretitle %}
     Playergroup Detail
 {% endblock page-pretitle %}
@@ -10,7 +12,7 @@
 {% endblock object_buttons %}
 
 {% block specific_content %}
-    <div class="card">
+    <div class="card mb-4">
         <div class="card-header">
             <h3 class="card-title">
                 <strong>Playergroup information</strong>
@@ -29,4 +31,14 @@
             </div>
         </div>
     </div>
+
+    {% trans "No Players found." as empty_title %}
+    {% trans "Assign Players to this group to list them here." as empty_subtitle %}
+    {% trans "Players" as table_heading %}
+    {% include "tables/table_card.html" with table=tables.0 filter=filters.0 id_filter_modal="id_filter_players" %}
+
+    {% trans "No Games found." as empty_title %}
+    {% trans "Add this group to a game to list it here." as empty_subtitle %}
+    {% trans "Games with this group" as table_heading %}
+    {% include "tables/table_card.html" with table=tables.1 filter=filters.1 id_filter_modal="id_filter_games" %}
 {% endblock specific_content %}

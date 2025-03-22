@@ -1,5 +1,7 @@
 {% extends "generic/object_detail.html" %}
 
+{% load i18n %}
+
 {% block page-pretitle %}
     Game Detail
 {% endblock page-pretitle %}
@@ -10,7 +12,7 @@
 {% endblock object_buttons %}
 
 {% block specific_content %}
-    <div class="card">
+    <div class="card mb-4">
         <div class="card-header">
             <h3 class="card-title">
                 <strong>Game information</strong>
@@ -33,4 +35,20 @@
             </div>
         </div>
     </div>
+
+    {% trans "No Groups assigned to the game yet." as empty_title %}
+    {% trans "Assign Groups by editing the game." as empty_subtitle %}
+    {% trans "Player Groups" as table_heading %}
+    {% include "tables/table_card.html" with table=tables.0 filter=filters.0 id_filter_modal="id_filter_groups" %}
+
+    {% trans "No Tasks assigned to the game yet." as empty_title %}
+    {% trans "Assign Tasks by editing the game." as empty_subtitle %}
+    {% trans "Tasks" as table_heading %}
+    {% include "tables/table_card.html" with table=tables.1 filter=filters.1 id_filter_modal="id_filter_tasks" %}
+
+    {% trans "No Submissions yet." as empty_title %}
+    {% trans "Wait for the players to do something." as empty_subtitle %}
+    {% trans "Submissions" as table_heading %}
+    {% include "tables/table_card.html" with table=tables.2 filter=filters.2 id_filter_modal="id_filter_submissions" %}
+
 {% endblock specific_content %}
