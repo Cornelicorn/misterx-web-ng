@@ -7,6 +7,7 @@
 {% endblock page-pretitle %}
 
 {% block object_buttons %}
+    <a href="{% url "misterx:submission-list" %}?game={{ object.id }}&accepted=null" class="btn btn-secondary">Unreviewed Submissions</a>
     <a href="{% url "misterx:game-edit" object.id %}" class="btn btn-warning">Edit</a>
     <a href="{% url "misterx:game-delete" object.id %}" class="btn btn-danger">Delete</a>
 {% endblock object_buttons %}

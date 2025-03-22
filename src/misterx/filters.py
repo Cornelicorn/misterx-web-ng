@@ -1,4 +1,4 @@
-from django_filters import FilterSet
+from django_filters import ChoiceFilter, FilterSet
 
 from .forms import FilterForm
 from .models import Game, Player, PlayerGroup, Submission, Task
@@ -26,6 +26,8 @@ class TaskFilter(FilterSet):
 
 
 class SubmissionFilter(FilterSet):
+    accepted = ChoiceFilter(null_label="Unreviewed", choices=((True, "Yes"), (False, "No")))
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in "group", "game", "task", "submitter":
