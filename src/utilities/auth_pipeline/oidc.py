@@ -6,7 +6,6 @@ def assign_groups_and_attributes(backend, user, response, *args, **kwargs):
     """
     Assign Django groups based on OIDC claims.
     """
-    print(f"{backend.name=}")
     if backend.name == "oidc":
         groups = response.get("groups", [])
 
