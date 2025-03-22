@@ -45,6 +45,7 @@ class SubmissionTable(tables.Table):
             "group",
             "game",
             "task",
+            "submitter",
             "time",
             "accepted",
             "granted_points",

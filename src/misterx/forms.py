@@ -67,6 +67,7 @@ class SubmissionForm(forms.ModelForm):
             "group",
             "game",
             "task",
+            "submitter",
             "accepted",
             "points_override",
             "explanation",

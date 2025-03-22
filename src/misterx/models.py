@@ -90,6 +90,7 @@ class Submission(models.Model):
     game = models.ForeignKey(Game, related_name="submissions", on_delete=models.CASCADE)
     task = models.ForeignKey(Task, related_name="submissions", on_delete=models.CASCADE)
     time = models.DateTimeField(_("Time"), help_text=_("Time of submission"), auto_now=True)
+    submitter = models.ForeignKey(Player, related_name="submissions",  null=True, on_delete=models.SET_NULL)
     accepted = models.BooleanField(
         _("Accepted"), help_text=_("Whether the solution was accepted"), null=True, blank=True, default=None
     )

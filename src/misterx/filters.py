@@ -28,7 +28,7 @@ class TaskFilter(FilterSet):
 class SubmissionFilter(FilterSet):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for field in ("group", "game", "task"):
+        for field in "group", "game", "task", "submitter":
             self.filters[field].queryset = (
                 self.filters[field].queryset.filter(id__in=self.queryset.values_list(field, flat=True)).distinct()
             )
@@ -40,6 +40,7 @@ class SubmissionFilter(FilterSet):
             "group",
             "game",
             "task",
+            "submitter",
             "time",
             "accepted",
             "points_override",
