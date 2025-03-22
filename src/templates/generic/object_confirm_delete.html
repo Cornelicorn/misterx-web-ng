@@ -5,7 +5,8 @@
 {% endblock page-pretitle %}
 
 {% block specific_content %}
-    <div class="alert alert-important alert-danger">
+<div class="card">
+    <div class="alert alert-important alert-danger mb-0">
 
         <form method="post">
             {% csrf_token %}
@@ -19,6 +20,6 @@
             <a href="{{ object.get_absolute_url }}" class="btn btn-light">Cancel</a>
             <input class="btn btn-danger" role="button" type="submit" value="Confirm">
         </form>
-
     </div>
+</div>
 {% endblock specific_content %}
