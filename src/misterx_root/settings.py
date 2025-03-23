@@ -148,7 +148,8 @@ SOCIAL_AUTH_PIPELINE = (
     "utilities.auth_pipeline.oidc.assign_groups_and_attributes",
 )
 
-LOGIN_REDIRECT_URL = "/games"
+LOGIN_REDIRECT_URL = "/submit"
+LOGIN_REDIRECT_URL_STAFF = "/games"
 
 # 4 hours in seconds
 SESSION_COOKIE_AGE = 4 * 60 * 60

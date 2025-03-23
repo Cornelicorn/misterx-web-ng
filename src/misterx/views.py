@@ -1,3 +1,5 @@
+from django.core.exceptions import ObjectDoesNotExist
+from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import DeleteView, DetailView, UpdateView
 from django_filters.views import FilterView
@@ -7,9 +9,13 @@ from guardian.mixins import LoginRequiredMixin, PermissionListMixin, PermissionR
 from utilities.views import InitialCreateView
 
 from .filters import GameFilter, PlayerFilter, PlayerGroupFilter, SubmissionFilter, TaskFilter
-from .forms import GameForm, GameSubmissionForm, PlayerForm, PlayerGroupForm, SubmissionForm, TaskForm
+from .forms import GameForm, GameSubmissionForm, PlayerForm, PlayerGroupForm, SubmissionForm, TaskForm, UserSubmissionForm
 from .models import Game, Player, PlayerGroup, Submission, Task
 from .tables import GamePlayerGroupTable, GameTable, PlayerGroupTable, PlayerTable, SubmissionTable, TaskTable
+
+
+class NoActiveGameError(Exception):
+    pass
 
 
 class GameListView(LoginRequiredMixin, PermissionListMixin, SingleTableMixin, FilterView):
@@ -253,3 +259,27 @@ class PlayerGroupDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteV
     permission_required = "misterx.delete_playergroup"
     success_url = reverse_lazy("misterx:playergroup-list")
     template_name = "generic/object_confirm_delete.html"
+
+
+class UserSubmissionView(LoginRequiredMixin, InitialCreateView):
+    model = Submission
+    template_name = "generic/object_create.html"
+    form_class = UserSubmissionForm
+
+    def get_initial(self):
+        initial = super().get_initial()
+        groups = self.request.user.groups.all()
+        try:
+            game = Game.objects.filter(groups__in=groups).get(active=True)
+        except ObjectDoesNotExist:
+            raise NoActiveGameError()
+        group = game.groups.intersection(groups).first()
+        initial.update({"game": game.pk, "submitter": self.request.user.pk, "group": group.pk})
+        return initial
+
+    def get(self, request, *args, **kwargs):
+        try:
+            resp = super().get(request, *args, **kwargs)
+        except NoActiveGameError:
+            resp = render(request, "misterx/no_active_game.html")
+        return resp

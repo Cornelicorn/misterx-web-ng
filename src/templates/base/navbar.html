@@ -1,6 +1,10 @@
 <header class="navbar navbar-expand-md navbar-light">
     <div class="container-xl">
-        <a class="navbar-brand" href="{% url "misterx:game-list" %}">Mister X</a>
+        {% if user.is_staff %}
+            <a class="navbar-brand" href="{% url "misterx:game-list" %}">Mister X</a>
+        {% else %}
+            <a class="navbar-brand" href="{% url "misterx:user-submission-create" %}">Mister X</a>
+        {% endif %}
 
         <div class="d-s-flex d-md-none dropdown ms-auto me-2 nav-item">
             <a id="id_theme_dropdown_mobile"
@@ -34,6 +38,7 @@
         <div class="navbar-collapse collapse" id="navbar-menu">
             <div class="d-flex flex-column flex-md-row flex-fill align-items-stretch align-items-md-center">
                 <ul class="navbar-nav">
+                    {% if user.is_staff %}
                     <li class="nav-item
                                {% if request.resolver_match.url_name == 'game-list' %}active" aria-current="true{% endif %}">
                         <a href="{% url "misterx:game-list" %}" class="nav-link">Games List</a>
@@ -54,6 +59,12 @@
                                {% if request.resolver_match.url_name == 'playergroup-list' %}active" aria-current="true{% endif %}">
                         <a href="{% url "misterx:playergroup-list" %}" class="nav-link">Playergroup List</a>
                     </li>
+                    {% else %}
+                    <li class="nav-item
+                        {% if request.resolver_match.url_name == 'user-submission-create' %}active" aria-current="true{% endif %}">
+                        <a href="{% url "misterx:user-submission-create" %}" class="nav-link">Submit a Task</a>
+                    </li>
+                    {% endif %}
                 </ul>
             </div>
 

@@ -134,3 +134,14 @@ class PlayerGroupForm(forms.ModelForm):
         fields = [
             "name",
         ]
+
+
+class UserSubmissionForm(SubmissionForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in "game", "group", "accepted", "submitter", "points_override":
+            self.fields[field].widget = forms.HiddenInput()
+
+        # Limit displayed tasks to the tasks in the given game
+        game = Game.objects.get(pk=kwargs.get("initial").get("game"))
+        self.fields["task"].choices = game.tasks.all().values_list("pk", "task")
