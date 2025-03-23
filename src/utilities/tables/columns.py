@@ -9,7 +9,7 @@ class OpenColumn(tables.TemplateColumn):
             verbose_name=verbose_name,
             attrs={
                 "td": {"align": "right"},
-                "th": {"style": "text-align: right;"},
+                "th": {"style": "text-align: right;", "class": "w-1"},
             },
             orderable=False,
         )
@@ -23,7 +23,7 @@ class EditColumn(tables.TemplateColumn):
             verbose_name=verbose_name,
             attrs={
                 "td": {"align": "right"},
-                "th": {"style": "text-align: right;"},
+                "th": {"style": "text-align: right;", "class": "w-1"},
             },
             orderable=False,
         )
@@ -37,7 +37,7 @@ class DeleteColumn(tables.TemplateColumn):
             verbose_name=verbose_name,
             attrs={
                 "td": {"align": "right"},
-                "th": {"style": "text-align: right;"},
+                "th": {"style": "text-align: right;", "class": "w-1"},
             },
             orderable=False,
         )

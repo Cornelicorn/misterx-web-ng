@@ -13,7 +13,7 @@ class AddSubmissionColumn(tables.TemplateColumn):
             verbose_name=verbose_name,
             attrs={
                 "td": {"align": "right"},
-                "th": {"style": "text-align: right;"},
+                "th": {"style": "text-align: right;", "class": "w-1"},
             },
             orderable=False,
         )
@@ -103,4 +103,5 @@ class GamePlayerGroupTable(tables.Table):
         model = PlayerGroup
         fields = [
             "name",
+            "add",
         ]
