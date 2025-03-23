@@ -66,6 +66,10 @@
                         {% if request.resolver_match.url_name == 'user-submission-create' %}active" aria-current="true{% endif %}">
                         <a href="{% url "misterx:user-submission-create" %}" class="nav-link">{% trans "Submit a Task" %}</a>
                     </li>
+                    <li class="nav-item
+                        {% if request.resolver_match.url_name == 'user-submission-list' %}active" aria-current="true{% endif %}">
+                        <a href="{% url "misterx:user-submission-list" %}" class="nav-link">{% trans "List Submissions" %}</a>
+                    </li>
                     {% endif %}
                 </ul>
             </div>

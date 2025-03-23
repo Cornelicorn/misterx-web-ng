@@ -69,3 +69,25 @@ class PlayerGroupFilter(FilterSet):
         fields = [
             "name",
         ]
+
+
+class UserSubmissionFilter(FilterSet):
+    accepted = ChoiceFilter(null_label="Unreviewed", choices=((True, "Yes"), (False, "No")))
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in "task", "submitter":
+            self.filters[field].queryset = (
+                self.filters[field].queryset.filter(id__in=self.queryset.values_list(field, flat=True)).distinct()
+            )
+
+    class Meta:
+        model = Submission
+        form = FilterForm
+        fields = [
+            "task",
+            "submitter",
+            "accepted",
+            "points_override",
+            "explanation",
+        ]

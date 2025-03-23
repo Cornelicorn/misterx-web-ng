@@ -105,3 +105,16 @@ class GamePlayerGroupTable(tables.Table):
             "name",
             "add",
         ]
+
+
+class UserSubmissionTable(tables.Table):
+    class Meta:
+        model = Submission
+        fields = [
+            "task",
+            "submitter",
+            "time",
+            "accepted",
+            "granted_points",
+            "explanation",
+        ]

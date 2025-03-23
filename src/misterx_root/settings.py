@@ -148,7 +148,7 @@ SOCIAL_AUTH_PIPELINE = (
     "utilities.auth_pipeline.oidc.assign_groups_and_attributes",
 )
 
-LOGIN_REDIRECT_URL = "/submit"
+LOGIN_REDIRECT_URL = "/user/submit"
 LOGIN_REDIRECT_URL_STAFF = "/games"
 
 # 4 hours in seconds

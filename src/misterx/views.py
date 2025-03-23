@@ -8,10 +8,18 @@ from guardian.mixins import LoginRequiredMixin, PermissionListMixin, PermissionR
 
 from utilities.views import InitialCreateView
 
-from .filters import GameFilter, PlayerFilter, PlayerGroupFilter, SubmissionFilter, TaskFilter
+from .filters import GameFilter, PlayerFilter, PlayerGroupFilter, SubmissionFilter, TaskFilter, UserSubmissionFilter
 from .forms import GameForm, GameSubmissionForm, PlayerForm, PlayerGroupForm, SubmissionForm, TaskForm, UserSubmissionForm
 from .models import Game, Player, PlayerGroup, Submission, Task
-from .tables import GamePlayerGroupTable, GameTable, PlayerGroupTable, PlayerTable, SubmissionTable, TaskTable
+from .tables import (
+    GamePlayerGroupTable,
+    GameTable,
+    PlayerGroupTable,
+    PlayerTable,
+    SubmissionTable,
+    TaskTable,
+    UserSubmissionTable,
+)
 
 
 class NoActiveGameError(Exception):
@@ -28,7 +36,7 @@ class GameListView(LoginRequiredMixin, PermissionListMixin, SingleTableMixin, Fi
 
 class GameCreateView(LoginRequiredMixin, PermissionRequiredMixin, InitialCreateView):
     model = Game
-    permission_required = "mister.add_game"
+    permission_required = "misterx.add_game"
     permission_object = None
     template_name = "generic/object_create.html"
     form_class = GameForm
@@ -36,7 +44,7 @@ class GameCreateView(LoginRequiredMixin, PermissionRequiredMixin, InitialCreateV
 
 class GameEditView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = Game
-    permission_required = "mister.change_game"
+    permission_required = "misterx.change_game"
     template_name = "generic/object_edit.html"
     form_class = GameForm
 
@@ -76,7 +84,7 @@ class TaskListView(LoginRequiredMixin, PermissionListMixin, SingleTableMixin, Fi
 
 class TaskCreateView(LoginRequiredMixin, PermissionRequiredMixin, InitialCreateView):
     model = Task
-    permission_required = "mister.add_task"
+    permission_required = "misterx.add_task"
     permission_object = None
     template_name = "generic/object_create.html"
     form_class = TaskForm
@@ -84,7 +92,7 @@ class TaskCreateView(LoginRequiredMixin, PermissionRequiredMixin, InitialCreateV
 
 class TaskEditView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = Task
-    permission_required = "mister.change_task"
+    permission_required = "misterx.change_task"
     template_name = "generic/object_edit.html"
     form_class = TaskForm
 
@@ -123,7 +131,7 @@ class SubmissionListView(LoginRequiredMixin, PermissionListMixin, SingleTableMix
 
 class SubmissionCreateView(LoginRequiredMixin, PermissionRequiredMixin, InitialCreateView):
     model = Submission
-    permission_required = "mister.add_submission"
+    permission_required = "misterx.add_submission"
     permission_object = None
     template_name = "generic/object_create.html"
     form_class = SubmissionForm
@@ -135,7 +143,7 @@ class GameSubmissionCreateView(SubmissionCreateView):
 
 class SubmissionEditView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = Submission
-    permission_required = "mister.change_submission"
+    permission_required = "misterx.change_submission"
     template_name = "generic/object_edit.html"
     form_class = SubmissionForm
 
@@ -177,7 +185,7 @@ class PlayerListView(LoginRequiredMixin, PermissionListMixin, SingleTableMixin, 
 
 class PlayerCreateView(LoginRequiredMixin, PermissionRequiredMixin, InitialCreateView):
     model = Player
-    permission_required = "mister.add_player"
+    permission_required = "misterx.add_player"
     permission_object = None
     template_name = "generic/object_create.html"
     form_class = PlayerForm
@@ -185,7 +193,7 @@ class PlayerCreateView(LoginRequiredMixin, PermissionRequiredMixin, InitialCreat
 
 class PlayerEditView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = Player
-    permission_required = "mister.change_player"
+    permission_required = "misterx.change_player"
     template_name = "generic/object_edit.html"
     form_class = PlayerForm
 
@@ -224,7 +232,7 @@ class PlayerGroupListView(LoginRequiredMixin, PermissionListMixin, SingleTableMi
 
 class PlayerGroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, InitialCreateView):
     model = PlayerGroup
-    permission_required = "mister.add_playergroup"
+    permission_required = "misterx.add_playergroup"
     permission_object = None
     template_name = "generic/object_create.html"
     form_class = PlayerGroupForm
@@ -232,7 +240,7 @@ class PlayerGroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, Initial
 
 class PlayerGroupEditView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = PlayerGroup
-    permission_required = "mister.change_playergroup"
+    permission_required = "misterx.change_playergroup"
     template_name = "generic/object_edit.html"
     form_class = PlayerGroupForm
 
@@ -276,6 +284,34 @@ class UserSubmissionView(LoginRequiredMixin, InitialCreateView):
         group = game.groups.intersection(groups).first()
         initial.update({"game": game.pk, "submitter": self.request.user.pk, "group": group.pk})
         return initial
+
+    def get(self, request, *args, **kwargs):
+        try:
+            resp = super().get(request, *args, **kwargs)
+        except NoActiveGameError:
+            resp = render(request, "misterx/no_active_game.html")
+        return resp
+
+    def get_success_url(self):
+        return reverse_lazy("misterx:user-submission-list")
+
+
+class UserSubmissionListView(LoginRequiredMixin, SingleTableMixin, FilterView):
+    model = Submission
+    table_class = UserSubmissionTable
+    template_name = "misterx/user_submission_list.html"
+    filterset_class = UserSubmissionFilter
+
+    def get_queryset(self):
+        groups = self.request.user.groups.all()
+        try:
+            game = Game.objects.filter(groups__in=groups).get(active=True)
+        except ObjectDoesNotExist:
+            raise NoActiveGameError()
+        group = game.groups.intersection(groups).first()
+        qs = super().get_queryset()
+        qs = qs.filter(game=game, group=group)
+        return qs
 
     def get(self, request, *args, **kwargs):
         try:
