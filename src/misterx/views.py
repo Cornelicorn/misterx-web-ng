@@ -7,7 +7,7 @@ from guardian.mixins import LoginRequiredMixin, PermissionListMixin, PermissionR
 from utilities.views import InitialCreateView
 
 from .filters import GameFilter, PlayerFilter, PlayerGroupFilter, SubmissionFilter, TaskFilter
-from .forms import GameForm, PlayerForm, PlayerGroupForm, SubmissionForm, TaskForm
+from .forms import GameForm, GameSubmissionForm, PlayerForm, PlayerGroupForm, SubmissionForm, TaskForm
 from .models import Game, Player, PlayerGroup, Submission, Task
 from .tables import GamePlayerGroupTable, GameTable, PlayerGroupTable, PlayerTable, SubmissionTable, TaskTable
 
@@ -121,6 +121,10 @@ class SubmissionCreateView(LoginRequiredMixin, PermissionRequiredMixin, InitialC
     permission_object = None
     template_name = "generic/object_create.html"
     form_class = SubmissionForm
+
+
+class GameSubmissionCreateView(SubmissionCreateView):
+    form_class = GameSubmissionForm
 
 
 class SubmissionEditView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):

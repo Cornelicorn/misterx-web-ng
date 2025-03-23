@@ -6,6 +6,7 @@ from .views import (
     GameDetailView,
     GameEditView,
     GameListView,
+    GameSubmissionCreateView,
     PlayerCreateView,
     PlayerDeleteView,
     PlayerDetailView,
@@ -30,6 +31,7 @@ from .views import (
 
 urlpatterns = [
     path("games/", GameListView.as_view(), name="game-list"),
+    path("games/addsubmission", GameSubmissionCreateView.as_view(), name="game-submission-create"),
     path("games/create", GameCreateView.as_view(), name="game-create"),
     path("games/<slug:pk>", GameDetailView.as_view(), name="game-detail"),
     path("games/<slug:pk>/edit", GameEditView.as_view(), name="game-edit"),

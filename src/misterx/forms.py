@@ -76,6 +76,20 @@ class SubmissionForm(forms.ModelForm):
         ]
 
 
+class GameSubmissionForm(SubmissionForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in "game", "group", "accepted", "explanation":
+            self.fields[field].widget = forms.HiddenInput()
+
+        # Limit displayed tasks to the tasks in the given game
+        game = Game.objects.get(pk=kwargs.get("initial").get("game"))
+        self.fields["task"].choices = game.tasks.all().values_list("pk", "task")
+        # Limit displayed submitters to the ones in the given group
+        group = PlayerGroup.objects.get(pk=kwargs.get("initial").get("group"))
+        self.fields["submitter"].choices = group.user_set.all().values_list("pk", "username")
+
+
 class PlayerForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

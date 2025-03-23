@@ -17,7 +17,7 @@ class AddSubmissionColumn(tables.TemplateColumn):
             },
             orderable=False,
         )
-        self.extra_context.update({"url_target": "misterx:submission-create"})
+        self.extra_context.update({"url_target": "misterx:game-submission-create"})
 
 
 class GameTable(tables.Table):
