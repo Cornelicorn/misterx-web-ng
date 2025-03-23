@@ -5,6 +5,7 @@ from django.views.generic import DeleteView, DetailView, UpdateView
 from django_filters.views import FilterView
 from django_tables2 import MultiTableMixin, SingleTableMixin
 from guardian.mixins import LoginRequiredMixin, PermissionListMixin, PermissionRequiredMixin
+from django.core.exceptions import PermissionDenied
 
 from utilities.views import InitialCreateView
 
@@ -319,3 +320,26 @@ class UserSubmissionListView(LoginRequiredMixin, SingleTableMixin, FilterView):
         except NoActiveGameError:
             resp = render(request, "misterx/no_active_game.html")
         return resp
+
+
+class UserSubmissionDetailView(LoginRequiredMixin, SingleTableMixin, DetailView):
+    model = Submission
+    table_class = UserSubmissionTable
+    template_name = "misterx/user_submission_detail.html"
+
+    def get_table_data(self):
+        obj = self.get_object()
+        own_submissions = Submission.objects.filter(game=obj.game, task=obj.task, group=obj.group).exclude(pk=obj.pk)
+        own_submissions_filter = UserSubmissionFilter(self.request.GET, own_submissions, prefix="own")
+        self.filter = own_submissions_filter
+        return own_submissions_filter.qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({"filter": self.filter})
+        return context
+
+    def get(self, request, *args, **kwargs):
+        if self.get_object().group not in self.request.user.groups.all():
+            raise PermissionDenied("You are not in the group of this Submission")
+        return super().get(request, *args, **kwargs)

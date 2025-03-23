@@ -27,6 +27,7 @@ from .views import (
     TaskDetailView,
     TaskEditView,
     TaskListView,
+    UserSubmissionDetailView,
     UserSubmissionListView,
     UserSubmissionView,
 )
@@ -60,6 +61,7 @@ urlpatterns = [
     path("playergroups/<slug:pk>/delete", PlayerGroupDeleteView.as_view(), name="playergroup-delete"),
     path("user/submit/", UserSubmissionView.as_view(), name="user-submission-create"),
     path("user/submissions/", UserSubmissionListView.as_view(), name="user-submission-list"),
+    path("user/submissions/<slug:pk>", UserSubmissionDetailView.as_view(), name="user-submission-detail"),
 ]
 
 app_name = "misterx"

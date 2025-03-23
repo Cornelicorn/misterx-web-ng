@@ -108,6 +108,8 @@ class GamePlayerGroupTable(tables.Table):
 
 
 class UserSubmissionTable(tables.Table):
+    open = OpenColumn("misterx:user-submission-detail")
+
     class Meta:
         model = Submission
         fields = [

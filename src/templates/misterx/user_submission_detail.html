@@ -6,11 +6,6 @@
     Submission Detail
 {% endblock page-pretitle %}
 
-{% block object_buttons %}
-    <a href="{% url "misterx:submission-edit" object.id %}" class="btn btn-warning">Edit</a>
-    <a href="{% url "misterx:submission-delete" object.id %}" class="btn btn-danger">Delete</a>
-{% endblock object_buttons %}
-
 {% block specific_content %}
     <div class="card mb-4">
         <div class="card-header">
@@ -21,16 +16,8 @@
         <div class="card-body">
             <div class="datagrid">
                 <div class="datagrid-item">
-                    <div class="datagrid-title">Group</div>
-                    <div class="datagrid-content">{{ object.group }}</div>
-                </div>
-                <div class="datagrid-item">
                     <div class="datagrid-title">Task</div>
                     <div class="datagrid-content">{{ object.task }}</div>
-                </div>
-                <div class="datagrid-item">
-                    <div class="datagrid-title">Game</div>
-                    <div class="datagrid-content">{{ object.game }}</div>
                 </div>
                 <div class="datagrid-item">
                     <div class="datagrid-title">Time</div>
@@ -39,10 +26,6 @@
                 <div class="datagrid-item">
                     <div class="datagrid-title">Accepted</div>
                     <div class="datagrid-content">{{ object.accepted | yesno:"Yes,No,Not yet reviewed" }}</div>
-                </div>
-                <div class="datagrid-item">
-                    <div class="datagrid-title">Points overriden</div>
-                    <div class="datagrid-content">{{ object.points_override | yesno:"Yes,Yes,No" }}</div>
                 </div>
                 <div class="datagrid-item">
                     <div class="datagrid-title">Granted points</div>
@@ -65,14 +48,9 @@
         </div>
     {% endif %}
 
-    {% trans "This group has only submitted this task once." as empty_title %}
-    {% trans "If you didn't accept it, wait for the group to submit it again." as empty_subtitle %}
-    {% trans "Other Submissions by this group" as table_heading %}
-    {% include "tables/table_card.html" with table=tables.0 filter=filters.0 id_filter_modal="id_filter_own" %}
-
-    {% trans "Other groups haven't submitted this task yet." as empty_title %}
-    {% trans "Wait for the other players to do something." as empty_subtitle %}
-    {% trans "Submissions for this task from other groups" as table_heading %}
-    {% include "tables/table_card.html" with table=tables.1 filter=filters.1 id_filter_modal="id_filter_other" %}
+    {% trans "You have only submitted this task once." as empty_title %}
+    {% trans "If we didn't accept it, submit it again." as empty_subtitle %}
+    {% trans "Other Submissions by your group for this task" as table_heading %}
+    {% include "tables/table_card.html" with id_filter_modal="id_filter_own" %}
 
 {% endblock specific_content %}
