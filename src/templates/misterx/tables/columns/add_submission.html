@@ -1,0 +1,8 @@
+{% load i18n %}
+
+<a href="{% url url_target %}?game={{ object.id }}&group={{ record.id }}&accepted=true"
+   class="btn btn-success"
+   aria-label="{% trans "Add Submission" %}"
+   title="{% trans "Add Submission" %}">
+    <i class="ti ti-plus"></i>
+</a>

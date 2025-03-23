@@ -9,7 +9,7 @@ from utilities.views import InitialCreateView
 from .filters import GameFilter, PlayerFilter, PlayerGroupFilter, SubmissionFilter, TaskFilter
 from .forms import GameForm, PlayerForm, PlayerGroupForm, SubmissionForm, TaskForm
 from .models import Game, Player, PlayerGroup, Submission, Task
-from .tables import GameTable, PlayerGroupTable, PlayerTable, SubmissionTable, TaskTable
+from .tables import GamePlayerGroupTable, GameTable, PlayerGroupTable, PlayerTable, SubmissionTable, TaskTable
 
 
 class GameListView(LoginRequiredMixin, PermissionListMixin, SingleTableMixin, FilterView):
@@ -38,7 +38,7 @@ class GameEditView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
 class GameDetailView(LoginRequiredMixin, PermissionRequiredMixin, MultiTableMixin, DetailView):
     model = Game
     permission_required = "misterx.view_game"
-    tables = PlayerGroupTable, TaskTable, SubmissionTable
+    tables = GamePlayerGroupTable, TaskTable, SubmissionTable
 
     def get_tables_data(self):
         groups = PlayerGroupFilter(self.request.GET, self.get_object().groups.all(), prefix="groups")
