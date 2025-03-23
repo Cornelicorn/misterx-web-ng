@@ -1,8 +1,9 @@
 {% extends "misterx/submission_list.html" %}
+{% load i18n %}
 
 {% block createbutton %}
     <a href="{% url "misterx:user-submission-create" %}" class="btn btn-success">
         <i class="ti ti-plus me-2"></i>
-        Submit a Task
+        {% trans "Submit a Task" %}
     </a>
 {% endblock createbutton %}

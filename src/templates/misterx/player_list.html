@@ -1,12 +1,13 @@
 {% extends "generic/object_list.html" %}
+{% load i18n %}
 
 {% block createbutton %}
     <a href="{% url "misterx:player-create" %}" class="btn btn-success">
         <i class="ti ti-plus me-2"></i>
-        Create new Player
+        {% trans "Create new Player" %}
     </a>
 {% endblock createbutton %}
 
 {% block page-title %}
-    Players
+    {% trans "Players" %}
 {% endblock page-title %}

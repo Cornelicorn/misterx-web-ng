@@ -3,33 +3,33 @@
 {% load i18n %}
 
 {% block page-pretitle %}
-    Task Detail
+    {% trans "Task Detail" %}
 {% endblock page-pretitle %}
 
 {% block object_buttons %}
-    <a href="{% url "misterx:task-edit" object.id %}" class="btn btn-warning">Edit</a>
-    <a href="{% url "misterx:task-delete" object.id %}" class="btn btn-danger">Delete</a>
+    <a href="{% url "misterx:task-edit" object.id %}" class="btn btn-warning">{% trans "Edit" %}</a>
+    <a href="{% url "misterx:task-delete" object.id %}" class="btn btn-danger">{% trans "Delete" %}</a>
 {% endblock object_buttons %}
 
 {% block specific_content %}
     <div class="card mb-4">
         <div class="card-header">
             <h3 class="card-title">
-                <strong>Task information</strong>
+                <strong>{% trans "Task information" %}</strong>
             </h3>
         </div>
         <div class="card-body">
             <div class="datagrid">
                 <div class="datagrid-item">
-                    <div class="datagrid-title">Task</div>
+                    <div class="datagrid-title">{% trans "Task" %}</div>
                     <div class="datagrid-content">{{ object.task }}</div>
                 </div>
                 <div class="datagrid-item">
-                    <div class="datagrid-title">Points</div>
+                    <div class="datagrid-title">{% trans "Points" %}</div>
                     <div class="datagrid-content">{{ object.points }}</div>
                 </div>
                 <div class="datagrid-item">
-                    <div class="datagrid-title">Solution</div>
+                    <div class="datagrid-title">{% trans "Solution" %}</div>
                     <div class="datagrid-content">{{ object.solution }}</div>
                 </div>
             </div>

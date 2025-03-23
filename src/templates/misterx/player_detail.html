@@ -3,37 +3,37 @@
 {% load i18n %}
 
 {% block page-pretitle %}
-    Player Detail
+    {% trans "Player Detail" %}
 {% endblock page-pretitle %}
 
 {% block object_buttons %}
-    <a href="{% url "misterx:player-edit" object.id %}" class="btn btn-warning">Edit</a>
-    <a href="{% url "misterx:player-delete" object.id %}" class="btn btn-danger">Delete</a>
+    <a href="{% url "misterx:player-edit" object.id %}" class="btn btn-warning">{% trans "Edit" %}</a>
+    <a href="{% url "misterx:player-delete" object.id %}" class="btn btn-danger">{% trans "Delete" %}</a>
 {% endblock object_buttons %}
 
 {% block specific_content %}
     <div class="card mb-4">
         <div class="card-header">
             <h2 class="card-title">
-                <strong>Player information</strong>
+                <strong>{% trans "Player information" %}</strong>
             </h2>
         </div>
         <div class="card-body">
             <div class="datagrid">
                 <div class="datagrid-item">
-                    <div class="datagrid-title">Username</div>
+                    <div class="datagrid-title">{% trans "Username" %}</div>
                     <div class="datagrid-content">{{ object.username }}</div>
                 </div>
                 <div class="datagrid-item">
-                    <div class="datagrid-title">First Name</div>
+                    <div class="datagrid-title">{% trans "First Name" %}</div>
                     <div class="datagrid-content">{{ object.first_name }}</div>
                 </div>
                 <div class="datagrid-item">
-                    <div class="datagrid-title">Last Name</div>
+                    <div class="datagrid-title">{% trans "Last Name" %}</div>
                     <div class="datagrid-content">{{ object.last_name }}</div>
                 </div>
                 <div class="datagrid-item">
-                    <div class="datagrid-title">Active</div>
+                    <div class="datagrid-title">{% trans "Active" %}</div>
                     <div class="datagrid-content">{{ object.is_active | yesno }}</div>
                 </div>
             </div>

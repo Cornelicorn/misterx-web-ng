@@ -1,12 +1,13 @@
 {% extends "generic/object_list.html" %}
+{% load i18n %}
 
 {% block createbutton %}
     <a href="{% url "misterx:submission-create" %}" class="btn btn-success">
         <i class="ti ti-plus me-2"></i>
-        Create new Submission
+        {% trans "Create new Submission" %}
     </a>
 {% endblock createbutton %}
 
 {% block page-title %}
-    Submission
+    {% trans "Submission" %}
 {% endblock page-title %}
