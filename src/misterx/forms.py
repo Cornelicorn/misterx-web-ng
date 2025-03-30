@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.db.models import Count
 from django.utils.translation import gettext_lazy as _
 
-from .models import Game, Player, PlayerGroup, Submission, Task
+from .models import Game, OrderedTask, Player, PlayerGroup, Submission, Task
 
 
 class FilterForm(forms.Form):
@@ -84,7 +84,9 @@ class GameSubmissionForm(SubmissionForm):
 
         # Limit displayed tasks to the tasks in the given game
         game = Game.objects.get(pk=kwargs.get("initial").get("game"))
-        self.fields["task"].choices = game.tasks.all().values_list("pk", "task")
+        self.fields["task"].choices = (
+            (t.task.id, str(t)) for t in OrderedTask.objects.filter(game=game, task__in=game.tasks.all())
+        )
         # Limit displayed submitters to the ones in the given group
         group = PlayerGroup.objects.get(pk=kwargs.get("initial").get("group"))
         self.fields["submitter"].choices = group.user_set.all().values_list("pk", "username")
@@ -144,4 +146,6 @@ class UserSubmissionForm(SubmissionForm):
 
         # Limit displayed tasks to the tasks in the given game
         game = Game.objects.get(pk=kwargs.get("initial").get("game"))
-        self.fields["task"].choices = game.tasks.all().values_list("pk", "task")
+        self.fields["task"].choices = (
+            (t.task.id, str(t)) for t in OrderedTask.objects.filter(game=game, task__in=game.tasks.all())
+        )

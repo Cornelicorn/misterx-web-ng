@@ -55,8 +55,26 @@ class Task(models.Model):
             return False
 
 
+class OrderedTask(models.Model):
+    task = models.ForeignKey(Task, on_delete=models.CASCADE)
+    game = models.ForeignKey("Game", on_delete=models.CASCADE)
+    task_number = models.IntegerField(verbose_name="Task number", null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.task_number or 'Unordered'}: {self.task}"
+
+    class Meta:
+        ordering = ["task_number"]
+        constraints = [
+            UniqueConstraint(
+                fields=["task", "game"],
+                name="unique_game_task_associations",
+            )
+        ]
+
+
 class Game(models.Model):
-    tasks = models.ManyToManyField(Task, related_name="games", blank=True)
+    tasks = models.ManyToManyField(Task, related_name="games", blank=True, through=OrderedTask)
     name = models.CharField(_("Name of Task Set"), max_length=255, default=get_default_game_name)
     date = models.DateField(_("Date of the game"), default=date.today)
     groups = models.ManyToManyField(PlayerGroup, related_name="games", blank=True)
@@ -87,10 +105,12 @@ class Game(models.Model):
 
     def clean(self):
         error_dict = {}
-        if duplicates := self.groups.values_list("user").annotate(occurences=Count("id")).exclude(occurences=1):
-            error_dict["groups"] = _("These users are present in multiple groups: {users}").format(
-                users=", ".join(str(Player.objects.get(pk=id)) for id, _ in duplicates)
-            )
+        # TODO: also check this during creation
+        if not self._state.adding:
+            if duplicates := self.groups.values_list("user").annotate(occurences=Count("id")).exclude(occurences=1):
+                error_dict["groups"] = _("These users are present in multiple groups: {users}").format(
+                    users=", ".join(str(Player.objects.get(pk=id)) for id, _ in duplicates)
+                )
         if error_dict:
             raise ValidationError(error_dict)
         return super().clean()

@@ -1,20 +1,21 @@
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
+from django.db import models
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import DeleteView, DetailView, UpdateView
 from django_filters.views import FilterView
 from django_tables2 import MultiTableMixin, SingleTableMixin
 from guardian.mixins import LoginRequiredMixin, PermissionListMixin, PermissionRequiredMixin
-from django.core.exceptions import PermissionDenied
 
 from utilities.views import InitialCreateView
 
 from .filters import GameFilter, PlayerFilter, PlayerGroupFilter, SubmissionFilter, TaskFilter, UserSubmissionFilter
 from .forms import GameForm, GameSubmissionForm, PlayerForm, PlayerGroupForm, SubmissionForm, TaskForm, UserSubmissionForm
-from .models import Game, Player, PlayerGroup, Submission, Task
+from .models import Game, OrderedTask, Player, PlayerGroup, Submission, Task
 from .tables import (
     GamePlayerGroupTable,
     GameTable,
+    OrderedTaskTable,
     PlayerGroupTable,
     PlayerTable,
     SubmissionTable,
@@ -53,12 +54,21 @@ class GameEditView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
 class GameDetailView(LoginRequiredMixin, PermissionRequiredMixin, MultiTableMixin, DetailView):
     model = Game
     permission_required = "misterx.view_game"
-    tables = GamePlayerGroupTable, TaskTable, SubmissionTable
+    tables = GamePlayerGroupTable, OrderedTaskTable, SubmissionTable
 
     def get_tables_data(self):
-        groups = PlayerGroupFilter(self.request.GET, self.get_object().groups.all(), prefix="groups")
-        tasks = TaskFilter(self.request.GET, self.get_object().tasks.all(), prefix="tasks")
-        submissions = SubmissionFilter(self.request.GET, self.get_object().submissions.all(), prefix="submissions")
+        game = self.get_object()
+        groups = PlayerGroupFilter(self.request.GET, game.groups.all(), prefix="groups")
+        tasks = TaskFilter(
+            self.request.GET,
+            game.tasks.annotate(
+                task_number=models.Subquery(
+                    OrderedTask.objects.filter(game=game, task__pk=models.OuterRef("pk")).values("task_number")
+                )
+            ).order_by("task_number"),
+            prefix="tasks",
+        )
+        submissions = SubmissionFilter(self.request.GET, game.submissions.all(), prefix="submissions")
         self.filters = groups, tasks, submissions
         return groups.qs, tasks.qs, submissions.qs
 

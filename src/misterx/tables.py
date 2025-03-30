@@ -50,6 +50,21 @@ class TaskTable(tables.Table):
         ]
 
 
+class OrderedTaskTable(TaskTable):
+    task_number = tables.Column(attrs={"th": {"class": "w-1"}})
+
+    class Meta:
+        model = Task
+        fields = [
+            "task_number",
+            "task",
+            "points",
+            "solution",
+            "open",
+            "edit",
+        ]
+
+
 class SubmissionTable(tables.Table):
     open = OpenColumn("misterx:submission-detail")
     edit = EditColumn("misterx:submission-edit")
