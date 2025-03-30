@@ -106,7 +106,7 @@ class Submission(models.Model):
         _("Accepted"), help_text=_("Whether the solution was accepted"), null=True, blank=True, default=None
     )
     points_override = models.PositiveIntegerField(
-        _("Granted points"),
+        _("Granted points override"),
         help_text="Override the number of points the group will receive for this submission",
         null=True,
         blank=True,
