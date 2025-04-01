@@ -80,6 +80,7 @@ class SubmissionTable(tables.Table):
             "accepted",
             "granted_points",
             "explanation",
+            "feedback",
             "open",
             "edit",
         ]
@@ -134,4 +135,5 @@ class UserSubmissionTable(tables.Table):
             "accepted",
             "granted_points",
             "explanation",
+            "feedback",
         ]

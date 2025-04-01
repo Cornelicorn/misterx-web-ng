@@ -135,6 +135,9 @@ class Submission(models.Model):
     explanation = models.TextField(
         _("Explanation"), help_text=_("Further explanations you might want to add"), null=True, blank=True
     )
+    feedback = models.TextField(
+        _("Feedback"), help_text=_("Optional Feedback on why this wasn't accepted"), null=True, blank=True
+    )
 
     @property
     def granted_points(self) -> int:

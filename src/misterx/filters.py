@@ -47,6 +47,7 @@ class SubmissionFilter(FilterSet):
             "accepted",
             "points_override",
             "explanation",
+            "feedback",
         ]
 
 
@@ -90,4 +91,5 @@ class UserSubmissionFilter(FilterSet):
             "accepted",
             "points_override",
             "explanation",
+            "feedback",
         ]

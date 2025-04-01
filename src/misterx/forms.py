@@ -73,13 +73,14 @@ class SubmissionForm(forms.ModelForm):
             "accepted",
             "points_override",
             "explanation",
+            "feedback",
         ]
 
 
 class GameSubmissionForm(SubmissionForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for field in "game", "group", "accepted", "explanation":
+        for field in "game", "group", "accepted", "explanation", "feedback":
             self.fields[field].widget = forms.HiddenInput()
 
         # Limit displayed tasks to the tasks in the given game
@@ -141,7 +142,7 @@ class PlayerGroupForm(forms.ModelForm):
 class UserSubmissionForm(SubmissionForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for field in "game", "group", "accepted", "submitter", "points_override":
+        for field in "game", "group", "accepted", "submitter", "points_override", "feedback":
             self.fields[field].widget = forms.HiddenInput()
 
         # Limit displayed tasks to the tasks in the given game
