@@ -141,10 +141,13 @@ class Submission(models.Model):
 
     @property
     def granted_points(self) -> int:
+        first_accepted = Submission.objects.filter(game=self.game, task=self.task, group=self.group).order_by("time").filter(accepted=True).first()
         if not self.accepted:
             return 0
         elif self.points_override is not None:
             return self.points_override
+        elif first_accepted is not None and first_accepted.pk != self.pk:
+            return 0
         else:
             return self.task.points
 
