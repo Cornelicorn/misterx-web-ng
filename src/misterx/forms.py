@@ -1,9 +1,12 @@
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 from django import forms
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db.models import Count
 from django.utils.translation import gettext_lazy as _
+
+from utilities.templatetags.utilities_media import get_main_mime_type
 
 from .models import Game, OrderedTask, Player, PlayerGroup, Submission, Task
 
@@ -17,12 +20,17 @@ class MultipleFileField(forms.FileField):
         kwargs.setdefault("widget", MultipleFileInput())
         super().__init__(*args, **kwargs)
 
+    def single_file_clean(self, data, inital):
+        mime_type = get_main_mime_type(data)
+        if mime_type not in settings.ALLOWED_UPLOADS:
+            raise ValidationError(_("The file type {mime_type} is not supported.").format(mime_type=mime_type))
+        return super().clean(data, inital)
+
     def clean(self, data, initial=None):
-        single_file_clean = super().clean
         if isinstance(data, list | tuple):
-            result = [single_file_clean(d, initial) for d in data]
+            result = [self.single_file_clean(d, initial) for d in data]
         else:
-            result = [single_file_clean(data, initial)]
+            result = [self.single_file_clean(data, initial)]
         return result
 
 

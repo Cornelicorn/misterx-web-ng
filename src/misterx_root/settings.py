@@ -205,3 +205,9 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 MEDIA_ROOT = getattr(local_settings, "MEDIA_ROOT", BASE_DIR / "media")
 
 MEDIA_URL = "media/"
+
+DEFAULT_ALLOWED_UPLOADS = (
+    "image",
+    "video",
+)
+ALLOWED_UPLOADS = getattr(local_settings, "ALLOWED_UPLOADS", DEFAULT_ALLOWED_UPLOADS)

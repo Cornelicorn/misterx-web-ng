@@ -1,6 +1,7 @@
 {% extends "generic/object_detail.html" %}
 
 {% load i18n %}
+{% load utilities_media %}
 
 {% block page-pretitle %}
     {% trans "Submission Detail" %}
@@ -69,19 +70,24 @@
         <h2>Proofs</h2>
         <div class="row row-cards">
             {% for proof in object.proofs.all %}
-                <div class="modal modal-blur fade" id="id_picture_modal_{{ proof.pk }}">
-                    <div class="modal-dialog modal-full-width">
-                        <div class="modal-content">
-                            <img height="auto"
-                                 width="auto"
-                                 src="{{ proof.file.url }}"
-                                 alt="Proof for this submission">
+                {% main_mime_type proof.file as mime_type %}
+
+                {% if mime_type == "image" %}
+                    <div class="modal modal-blur fade" id="id_picture_modal_{{ proof.pk }}">
+                        <div class="modal-dialog modal-full-width">
+                            <div class="modal-content">
+                                    <img height="auto"
+                                        width="auto"
+                                        src="{{ proof.file.url }}"
+                                        alt="Proof for this submission">
+                            </div>
                         </div>
                     </div>
-                </div>
+                {% endif %}
 
                 <div class="col-sm-6 col-lg-4">
                     <div class="card mb-4">
+                        {% if mime_type == "image" %}
                         <img class="card-img-top card-img-bottom"
                              height="auto"
                              width="auto"
@@ -89,11 +95,15 @@
                              data-bs-toggle="modal"
                              data-bs-target="#id_picture_modal_{{ proof.pk }}"
                              alt="Proof for this submission">
+                        {% elif mime_type == "video" %}
+                            <video src="{{ proof.file.url }}" class="card-img-top card-img-bottom" controls></video>
+                        {% else %}{% trans "Unsupported file type" %}{% endif %}
                     </div>
                 </div>
             {% endfor %}
         </div>
     {% endif %}
+
 
     {% trans "You have only submitted this task once." as empty_title %}
     {% trans "If we didn't accept it, submit it again." as empty_subtitle %}

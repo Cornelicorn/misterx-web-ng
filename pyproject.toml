@@ -13,6 +13,7 @@ dependencies = [
     "django-guardian>=2.4.0",
     "django-tables2>=2.7.5",
     "psycopg2-binary>=2.9.10",
+    "python-magic>=0.4.27",
     "social-auth-app-django>=5.4.3",
     "uwsgi>=2.0.28",
 ]

@@ -409,6 +409,7 @@ dependencies = [
     { name = "django-guardian" },
     { name = "django-tables2" },
     { name = "psycopg2-binary" },
+    { name = "python-magic" },
     { name = "social-auth-app-django" },
     { name = "uwsgi" },
 ]
@@ -432,6 +433,7 @@ requires-dist = [
     { name = "django-guardian", specifier = ">=2.4.0" },
     { name = "django-tables2", specifier = ">=2.7.5" },
     { name = "psycopg2-binary", specifier = ">=2.9.10" },
+    { name = "python-magic", specifier = ">=0.4.27" },
     { name = "social-auth-app-django", specifier = ">=5.4.3" },
     { name = "uwsgi", specifier = ">=2.0.28" },
 ]
@@ -562,6 +564,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/e7/46/bd74733ff231675599650d3e47f361794b22ef3e3770998dda30d3b63726/pyjwt-2.10.1.tar.gz", hash = "sha256:3cc5772eb20009233caf06e9d8a0577824723b44e6648ee0a2aedb6cf9381953", size = 87785 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/61/ad/689f02752eeec26aed679477e80e632ef1b682313be70793d798c1d5fc8f/PyJWT-2.10.1-py3-none-any.whl", hash = "sha256:dcdd193e30abefd5debf142f9adfcdd2b58004e644f25406ffaebd50bd98dacb", size = 22997 },
+]
+
+[[package]]
+name = "python-magic"
+version = "0.4.27"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/da/db/0b3e28ac047452d079d375ec6798bf76a036a08182dbb39ed38116a49130/python-magic-0.4.27.tar.gz", hash = "sha256:c1ba14b08e4a5f5c31a302b7721239695b2f0f058d125bd5ce1ee36b9d9d3c3b", size = 14677 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/6c/73/9f872cb81fc5c3bb48f7227872c28975f998f3e7c2b1c16e95e6432bbb90/python_magic-0.4.27-py2.py3-none-any.whl", hash = "sha256:c212960ad306f700aa0d01e5d7a325d20548ff97eb9920dcd29513174f0294d3", size = 13840 },
 ]
 
 [[package]]
