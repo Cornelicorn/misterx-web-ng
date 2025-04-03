@@ -6,6 +6,10 @@
     {% trans "Submission Detail" %}
 {% endblock page-pretitle %}
 
+{% block object_buttons %}
+    <a href="{% url "misterx:user-submission-create" %}?task={{ object.task.pk }}" class="btn btn-success">{% trans "Submit this task again" %}</a>
+{% endblock object_buttons %}
+
 {% block specific_content %}
     <div class="card mb-4">
         <div class="card-header">
