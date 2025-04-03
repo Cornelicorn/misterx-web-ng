@@ -174,3 +174,13 @@ class Submission(models.Model):
             models.Index(fields=["task"], name="%(app_label)s_%(class)s_task_idx"),
             models.Index(fields=["-time"], name="%(app_label)s_%(class)s_time_idx"),
         ]
+
+
+def get_upload_path(instance: "Upload", filename: str):
+    sub = instance.submission
+    return f"proofs/{sub.game}/{sub.group}/{sub.task}/{filename}"
+
+
+class Upload(models.Model):
+    submission = models.ForeignKey("Submission", on_delete=models.CASCADE, related_name="proofs")
+    file = models.FileField("File", upload_to=get_upload_path)

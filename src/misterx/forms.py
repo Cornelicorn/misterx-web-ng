@@ -8,6 +8,24 @@ from django.utils.translation import gettext_lazy as _
 from .models import Game, OrderedTask, Player, PlayerGroup, Submission, Task
 
 
+class MultipleFileInput(forms.ClearableFileInput):
+    allow_multiple_selected = True
+
+
+class MultipleFileField(forms.FileField):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("widget", MultipleFileInput())
+        super().__init__(*args, **kwargs)
+
+    def clean(self, data, initial=None):
+        single_file_clean = super().clean
+        if isinstance(data, list | tuple):
+            result = [single_file_clean(d, initial) for d in data]
+        else:
+            result = [single_file_clean(data, initial)]
+        return result
+
+
 class FilterForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -140,6 +158,8 @@ class PlayerGroupForm(forms.ModelForm):
 
 
 class UserSubmissionForm(SubmissionForm):
+    proof = MultipleFileField()
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in "game", "group", "accepted", "submitter", "points_override", "feedback":

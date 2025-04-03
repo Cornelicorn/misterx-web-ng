@@ -78,6 +78,36 @@
         </div>
     {% endif %}
 
+    {% if object.proofs.count %}
+        <h2>Proofs</h2>
+        <div class="row row-cards">
+            {% for proof in object.proofs.all %}
+                <div class="modal modal-blur fade" id="id_picture_modal_{{ proof.pk }}">
+                    <div class="modal-dialog modal-full-width">
+                        <div class="modal-content">
+                            <img height="auto"
+                                 width="auto"
+                                 src="{{ proof.file.url }}"
+                                 alt="Proof for this submission">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-6 col-lg-4">
+                    <div class="card mb-4">
+                        <img class="card-img-top card-img-bottom"
+                             height="auto"
+                             width="auto"
+                             src="{{ proof.file.url }}"
+                             data-bs-toggle="modal"
+                             data-bs-target="#id_picture_modal_{{ proof.pk }}"
+                             alt="Proof for this submission">
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
     {% trans "This group has only submitted this task once." as empty_title %}
     {% trans "If you didn't accept it, wait for the group to submit it again." as empty_subtitle %}
     {% trans "Other Submissions by this group" as table_heading %}

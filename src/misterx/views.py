@@ -11,7 +11,7 @@ from utilities.views import InitialCreateView
 
 from .filters import GameFilter, PlayerFilter, PlayerGroupFilter, SubmissionFilter, TaskFilter, UserSubmissionFilter
 from .forms import GameForm, GameSubmissionForm, PlayerForm, PlayerGroupForm, SubmissionForm, TaskForm, UserSubmissionForm
-from .models import Game, OrderedTask, Player, PlayerGroup, Submission, Task
+from .models import Game, OrderedTask, Player, PlayerGroup, Submission, Task, Upload
 from .tables import (
     GamePlayerGroupTable,
     GameTable,
@@ -305,6 +305,12 @@ class UserSubmissionView(LoginRequiredMixin, InitialCreateView):
 
     def get_success_url(self):
         return reverse_lazy("misterx:user-submission-list")
+
+    def form_valid(self, form):
+        ret = super().form_valid(form)
+        for file in form.cleaned_data["proof"]:
+            Upload.objects.create(submission=self.object, file=file)
+        return ret
 
 
 class UserSubmissionListView(LoginRequiredMixin, SingleTableMixin, FilterView):
