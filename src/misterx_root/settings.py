@@ -204,4 +204,4 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 MEDIA_ROOT = getattr(local_settings, "MEDIA_ROOT", BASE_DIR / "media")
 
-MEIDA_URL = "/media"
+MEDIA_URL = "media/"
