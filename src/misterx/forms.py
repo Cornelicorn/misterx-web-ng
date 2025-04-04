@@ -62,6 +62,18 @@ class GameForm(forms.ModelForm):
             "tasks",
         ]
 
+    # Check if any user is present in multiple of the selected groups
+    def clean_groups(self):
+        groups = self.cleaned_data["groups"]
+        if duplicates := groups.values_list("user").annotate(occurences=Count("id")).exclude(occurences=1):
+            raise ValidationError(
+                _("These users are present in multiple groups: {users}").format(
+                    users=", ".join(str(Player.objects.get(pk=id)) for id, _ in duplicates)
+                )
+            )
+        print(groups)
+        return groups
+
 
 class TaskForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):

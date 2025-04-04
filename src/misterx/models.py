@@ -104,18 +104,6 @@ class Game(models.Model):
             )
         ]
 
-    def clean(self):
-        error_dict = {}
-        # TODO: also check this during creation
-        if not self._state.adding:
-            if duplicates := self.groups.values_list("user").annotate(occurences=Count("id")).exclude(occurences=1):
-                error_dict["groups"] = _("These users are present in multiple groups: {users}").format(
-                    users=", ".join(str(Player.objects.get(pk=id)) for id, _ in duplicates)
-                )
-        if error_dict:
-            raise ValidationError(error_dict)
-        return super().clean()
-
 
 class Submission(models.Model):
     group = models.ForeignKey(PlayerGroup, related_name="submissions", on_delete=models.CASCADE)
