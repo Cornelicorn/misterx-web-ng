@@ -1,3 +1,4 @@
+from crispy_forms import layout
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 from django import forms
@@ -99,6 +100,35 @@ class SubmissionForm(forms.ModelForm):
             "accepted",
             "points_override",
             "explanation",
+            "feedback",
+        ]
+
+
+class SubmissionApproveForm(SubmissionForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_id = "id_submissionApproveForm"
+        self.helper.form_method = "post"
+        self.helper.title = "Submission"
+        self.helper.add_input(Submit("deny", _("Deny"), css_class="btn btn-danger w-25"))
+        self.helper.add_input(Submit("accept", _("Accept"), css_class="btn btn-success w-25 float-end"))
+
+        self.helper.layout = layout.Layout(
+            layout.Div(
+                layout.Div("points_override", css_class="col-md-2"),
+                layout.Div("feedback", css_class="col-md-10"),
+                css_class="row",
+            )
+        )
+        # Add default points for task as placeholder in override
+        self.fields["points_override"].widget.attrs.update({"placeholder": self.instance.task.points})
+        self.fields["feedback"].widget.attrs.update({"rows": 1})
+
+    class Meta:
+        model = Submission
+        fields = [
+            "points_override",
             "feedback",
         ]
 

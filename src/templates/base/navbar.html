@@ -3,7 +3,7 @@
 <header class="navbar navbar-expand-md navbar-light">
     <div class="container-xl">
         {% if user.is_staff %}
-            <a class="navbar-brand" href="{% url "misterx:game-list" %}">Mister X</a>
+            <a class="navbar-brand" href="{% url "misterx:submission-approve" %}">Mister X</a>
         {% else %}
             <a class="navbar-brand" href="{% url "misterx:user-submission-create" %}">Mister X</a>
         {% endif %}
@@ -41,6 +41,10 @@
             <div class="d-flex flex-column flex-md-row flex-fill align-items-stretch align-items-md-center">
                 <ul class="navbar-nav">
                     {% if user.is_staff %}
+                    <li class="nav-item
+                               {% if request.resolver_match.url_name == 'submission-approve' %}active" aria-current="true{% endif %}">
+                        <a href="{% url "misterx:submission-approve" %}" class="nav-link">{% trans "Review Submissions" %}</a>
+                    </li>
                     <li class="nav-item
                                {% if request.resolver_match.url_name == 'game-list' %}active" aria-current="true{% endif %}">
                         <a href="{% url "misterx:game-list" %}" class="nav-link">{% trans "Games List" %}</a>

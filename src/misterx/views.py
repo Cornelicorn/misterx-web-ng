@@ -10,7 +10,16 @@ from guardian.mixins import LoginRequiredMixin, PermissionListMixin, PermissionR
 from utilities.views import InitialCreateView
 
 from .filters import GameFilter, PlayerFilter, PlayerGroupFilter, SubmissionFilter, TaskFilter, UserSubmissionFilter
-from .forms import GameForm, GameSubmissionForm, PlayerForm, PlayerGroupForm, SubmissionForm, TaskForm, UserSubmissionForm
+from .forms import (
+    GameForm,
+    GameSubmissionForm,
+    PlayerForm,
+    PlayerGroupForm,
+    SubmissionApproveForm,
+    SubmissionForm,
+    TaskForm,
+    UserSubmissionForm,
+)
 from .models import Game, OrderedTask, Player, PlayerGroup, Submission, Task, Upload
 from .tables import (
     GamePlayerGroupTable,
@@ -25,6 +34,10 @@ from .tables import (
 
 
 class NoActiveGameError(Exception):
+    pass
+
+
+class NoUnreviewedSubmissions(Exception):
     pass
 
 
@@ -177,6 +190,65 @@ class SubmissionDetailView(LoginRequiredMixin, PermissionRequiredMixin, MultiTab
         context = super().get_context_data(**kwargs)
         context.update({"filters": self.filters})
         return context
+
+
+class SubmissionApproveView(LoginRequiredMixin, PermissionRequiredMixin, MultiTableMixin, UpdateView):
+    model = Submission
+    form_class = SubmissionApproveForm
+    permission_required = "misterx.change_submission"
+    permission_object = None
+    template_name = "misterx/submission_approve.html"
+    tables = SubmissionTable, SubmissionTable
+
+    def get_tables_data(self):
+        obj = self.get_object()
+        own_submissions = Submission.objects.filter(game=obj.game, task=obj.task, group=obj.group).exclude(pk=obj.pk)
+        other_submissions = Submission.objects.filter(game=obj.game, task=obj.task).exclude(group=obj.group)
+        own_submissions_filter = SubmissionFilter(self.request.GET, own_submissions, prefix="own")
+        other_submissions_filter = SubmissionFilter(self.request.GET, other_submissions, prefix="other")
+        self.filters = own_submissions_filter, other_submissions_filter
+        return own_submissions_filter.qs, other_submissions_filter.qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({"filters": self.filters})
+        return context
+
+    def get_object(self, queryset=None):
+        try:
+            game = Game.objects.get(active=True)
+        except ObjectDoesNotExist:
+            raise NoActiveGameError()
+
+        if queryset is None:
+            queryset = self.get_queryset()
+
+        obj = queryset.filter(game=game, accepted=None).first()
+        if obj is None:
+            raise NoUnreviewedSubmissions
+        return obj
+
+    def get(self, request, *args, **kwargs):
+        try:
+            resp = super().get(request, *args, **kwargs)
+        except NoActiveGameError:
+            resp = render(request, "misterx/no_active_game.html")
+        except NoUnreviewedSubmissions:
+            resp = render(request, "misterx/no_unreviewed_submissions.html")
+        return resp
+
+    # Cycle back to the same view every time
+    def get_success_url(self):
+        return reverse_lazy("misterx:submission-approve")
+
+    # Handle two submission buttons, one for accepting, one for denying
+    def form_valid(self, form):
+        if self.request.POST.get("deny"):
+            form.instance.accepted = False
+        if self.request.POST.get("accept"):
+            form.instance.accepted = True
+
+        return super().form_valid(form)
 
 
 class SubmissionDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
