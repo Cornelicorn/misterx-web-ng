@@ -1,3 +1,4 @@
+import uuid
 from datetime import date
 
 from django.contrib.auth import get_user_model
@@ -178,9 +179,11 @@ class Submission(models.Model):
 
 def get_upload_path(instance: "Upload", filename: str):
     sub = instance.submission
-    return f"proofs/{sub.game}/{sub.group}/{sub.task}/{filename}"
+    uuid = instance.uuid
+    return f"proofs/{sub.game.pk}/{sub.group.pk}/{sub.task.pk}/{uuid}.{filename}"
 
 
 class Upload(models.Model):
     submission = models.ForeignKey("Submission", on_delete=models.CASCADE, related_name="proofs")
+    uuid = models.UUIDField(verbose_name="UUID for upload", default=uuid.uuid4, editable=False)
     file = models.FileField("File", upload_to=get_upload_path)
