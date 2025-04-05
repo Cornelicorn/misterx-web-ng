@@ -253,3 +253,6 @@ class UserSubmissionForm(SubmissionForm):
         self.fields["task"].choices = (
             (t.task.id, str(t)) for t in OrderedTask.objects.filter(game=game, task__in=game.tasks.all())
         )
+
+    def clean_accepted(self):
+        return False
