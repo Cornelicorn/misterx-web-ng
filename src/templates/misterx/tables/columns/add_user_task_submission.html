@@ -1,0 +1,8 @@
+{% load i18n %}
+
+<a href="{% url url_target %}?task={{ record.id }}"
+   class="btn btn-success"
+   aria-label="{% trans "Submit this task" %}"
+   title="{% trans "Submit this task" %}">
+    <i class="ti ti-plus"></i>
+</a>

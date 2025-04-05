@@ -9,7 +9,15 @@ from guardian.mixins import LoginRequiredMixin, PermissionListMixin, PermissionR
 
 from utilities.views import InitialCreateView
 
-from .filters import GameFilter, PlayerFilter, PlayerGroupFilter, SubmissionFilter, TaskFilter, UserSubmissionFilter
+from .filters import (
+    GameFilter,
+    PlayerFilter,
+    PlayerGroupFilter,
+    SubmissionFilter,
+    TaskFilter,
+    UserSubmissionFilter,
+    UserTaskFilter,
+)
 from .forms import (
     GameForm,
     GameSubmissionForm,
@@ -30,6 +38,7 @@ from .tables import (
     SubmissionTable,
     TaskTable,
     UserSubmissionTable,
+    UserTaskTable,
 )
 
 
@@ -448,3 +457,42 @@ class UserSubmissionDetailView(LoginRequiredMixin, SingleTableMixin, DetailView)
         if self.get_object().group not in self.request.user.groups.all():
             raise PermissionDenied("You are not in the group of this Submission")
         return super().get(request, *args, **kwargs)
+
+
+class UserTaskListView(LoginRequiredMixin, SingleTableMixin, FilterView):
+    model = Task
+    table_class = UserTaskTable
+    template_name = "misterx/task_list.html"
+    filterset_class = UserTaskFilter
+
+    def get_queryset(self):
+        groups = self.request.user.groups.all()
+        try:
+            game = Game.objects.filter(groups__in=groups).get(active=True)
+        except ObjectDoesNotExist:
+            raise NoActiveGameError()
+        group = game.groups.intersection(groups).first()
+        qs = (
+            super()
+            .get_queryset()
+            .filter(pk__in=game.tasks.all().values_list("pk", flat=True))
+            .annotate(
+                task_number=models.Subquery(
+                    OrderedTask.objects.filter(game=game, task__pk=models.OuterRef("pk")).values("task_number")
+                )
+            )
+            .annotate(
+                completed=models.Subquery(
+                    models.Exists(Submission.objects.filter(game=game, group=group, task__pk=models.OuterRef("pk")))
+                )
+            )
+            .order_by("completed", "task_number")
+        )
+        return qs
+
+    def get(self, request, *args, **kwargs):
+        try:
+            resp = super().get(request, *args, **kwargs)
+        except NoActiveGameError:
+            resp = render(request, "misterx/no_active_game.html")
+        return resp

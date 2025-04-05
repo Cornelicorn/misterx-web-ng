@@ -25,6 +25,16 @@ class TaskFilter(FilterSet):
         ]
 
 
+class UserTaskFilter(FilterSet):
+    class Meta:
+        model = Task
+        form = FilterForm
+        fields = [
+            "task",
+            "points",
+        ]
+
+
 class SubmissionFilter(FilterSet):
     accepted = ChoiceFilter(null_label="Unreviewed", choices=((True, "Yes"), (False, "No")))
 

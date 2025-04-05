@@ -31,6 +31,7 @@ from .views import (
     UserSubmissionDetailView,
     UserSubmissionListView,
     UserSubmissionView,
+    UserTaskListView,
 )
 
 urlpatterns = [
@@ -61,6 +62,7 @@ urlpatterns = [
     path("playergroups/<slug:pk>", PlayerGroupDetailView.as_view(), name="playergroup-detail"),
     path("playergroups/<slug:pk>/edit", PlayerGroupEditView.as_view(), name="playergroup-edit"),
     path("playergroups/<slug:pk>/delete", PlayerGroupDeleteView.as_view(), name="playergroup-delete"),
+    path("user/tasks/", UserTaskListView.as_view(), name="user-task-list"),
     path("user/submit/", UserSubmissionView.as_view(), name="user-submission-create"),
     path("user/submissions/", UserSubmissionListView.as_view(), name="user-submission-list"),
     path("user/submissions/<slug:pk>", UserSubmissionDetailView.as_view(), name="user-submission-detail"),

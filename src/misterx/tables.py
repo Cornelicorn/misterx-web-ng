@@ -6,10 +6,10 @@ from utilities.tables.columns import EditColumn, OpenColumn
 from .models import Game, Player, PlayerGroup, Submission, Task
 
 
-class AddSubmissionColumn(tables.TemplateColumn):
+class AddSubmissionForGroupColumn(tables.TemplateColumn):
     def __init__(self, verbose_name: str = _("Add Submission")):
         super().__init__(
-            template_name="misterx/tables/columns/add_submission.html",
+            template_name="misterx/tables/columns/add_group_submission.html",
             verbose_name=verbose_name,
             attrs={
                 "td": {"align": "right"},
@@ -18,6 +18,20 @@ class AddSubmissionColumn(tables.TemplateColumn):
             orderable=False,
         )
         self.extra_context.update({"url_target": "misterx:game-submission-create"})
+
+
+class AddSubmissionForTaskColumn(tables.TemplateColumn):
+    def __init__(self, verbose_name: str = _("Submit")):
+        super().__init__(
+            template_name="misterx/tables/columns/add_user_task_submission.html",
+            verbose_name=verbose_name,
+            attrs={
+                "td": {"align": "right"},
+                "th": {"style": "text-align: right;", "class": "w-1"},
+            },
+            orderable=False,
+        )
+        self.extra_context.update({"url_target": "misterx:user-submission-create"})
 
 
 class GameTable(tables.Table):
@@ -65,9 +79,25 @@ class OrderedTaskTable(TaskTable):
         ]
 
 
+class UserTaskTable(tables.Table):
+    task_number = tables.Column(attrs={"th": {"class": "w-1"}})
+    completed = tables.BooleanColumn()
+    add = AddSubmissionForTaskColumn()
+
+    class Meta:
+        model = Task
+        fields = [
+            "task_number",
+            "task",
+            "points",
+            "completed",
+        ]
+
+
 class SubmissionTable(tables.Table):
     open = OpenColumn("misterx:submission-detail")
     edit = EditColumn("misterx:submission-edit")
+    granted_points = tables.Column(orderable=False)
 
     class Meta:
         model = Submission
@@ -113,7 +143,7 @@ class PlayerGroupTable(tables.Table):
 class GamePlayerGroupTable(tables.Table):
     open = OpenColumn("misterx:playergroup-detail")
     edit = EditColumn("misterx:playergroup-edit")
-    add = AddSubmissionColumn()
+    add = AddSubmissionForGroupColumn()
 
     class Meta:
         model = PlayerGroup
@@ -125,6 +155,7 @@ class GamePlayerGroupTable(tables.Table):
 
 class UserSubmissionTable(tables.Table):
     open = OpenColumn("misterx:user-submission-detail")
+    granted_points = tables.Column(orderable=False)
 
     class Meta:
         model = Submission
