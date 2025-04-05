@@ -525,8 +525,8 @@ def serve_proofs(request, *args, **kwargs):
             return serve(request, *args, **kwargs)
         else:
             response = HttpResponse()
-            response['Content-Type'] = ''
-            response['X-Accel-Redirect'] = request.path
+            response["Content-Type"] = ""
+            response["X-Accel-Redirect"] = "/protected_media/" + request.path
             return response
     else:
         return HttpResponse(status=403)
