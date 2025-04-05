@@ -21,9 +21,12 @@ class TaskSelectWidget(forms.SelectMultiple):
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
-        selected = self.game.tasks.annotate(
-            task_number=Subquery(OrderedTask.objects.filter(game=self.game, task__pk=OuterRef("pk")).values("task_number"))
-        ).order_by("task_number")
+        if self.game.pk:
+            selected = self.game.tasks.annotate(
+                task_number=Subquery(OrderedTask.objects.filter(game=self.game, task__pk=OuterRef("pk")).values("task_number"))
+            ).order_by("task_number")
+        else:
+            selected = Task.objects.none()
         unselected = Task.objects.exclude(id__in=selected.values_list("id", flat=True))
         context["widget"].update({"selected_tasks": selected, "unselected_tasks": unselected})
         return context
