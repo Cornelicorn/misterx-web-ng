@@ -1,10 +1,12 @@
-from django_filters import ChoiceFilter, FilterSet
+from django_filters import CharFilter, ChoiceFilter, FilterSet
 
 from .forms import FilterForm
 from .models import Game, Player, PlayerGroup, Submission, Task
 
 
 class GameFilter(FilterSet):
+    name = CharFilter(lookup_expr="icontains")
+
     class Meta:
         model = Game
         form = FilterForm
@@ -15,6 +17,9 @@ class GameFilter(FilterSet):
 
 
 class TaskFilter(FilterSet):
+    task = CharFilter(lookup_expr="icontains")
+    solution = CharFilter(lookup_expr="icontains")
+
     class Meta:
         model = Task
         form = FilterForm
@@ -26,6 +31,8 @@ class TaskFilter(FilterSet):
 
 
 class UserTaskFilter(FilterSet):
+    task = CharFilter(lookup_expr="icontains")
+
     class Meta:
         model = Task
         form = FilterForm
@@ -37,6 +44,8 @@ class UserTaskFilter(FilterSet):
 
 class SubmissionFilter(FilterSet):
     accepted = ChoiceFilter(null_label="Unreviewed", choices=((True, "Yes"), (False, "No")))
+    explanation = CharFilter(lookup_expr="icontains")
+    feedback = CharFilter(lookup_expr="icontains")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -53,7 +62,6 @@ class SubmissionFilter(FilterSet):
             "game",
             "task",
             "submitter",
-            "time",
             "accepted",
             "points_override",
             "explanation",
@@ -62,6 +70,10 @@ class SubmissionFilter(FilterSet):
 
 
 class PlayerFilter(FilterSet):
+    username = CharFilter(lookup_expr="icontains")
+    first_name = CharFilter(lookup_expr="icontains")
+    last_name = CharFilter(lookup_expr="icontains")
+
     class Meta:
         model = Player
         form = FilterForm
@@ -74,6 +86,8 @@ class PlayerFilter(FilterSet):
 
 
 class PlayerGroupFilter(FilterSet):
+    name = CharFilter(lookup_expr="icontains")
+
     class Meta:
         model = PlayerGroup
         form = FilterForm
@@ -84,6 +98,8 @@ class PlayerGroupFilter(FilterSet):
 
 class UserSubmissionFilter(FilterSet):
     accepted = ChoiceFilter(null_label="Unreviewed", choices=((True, "Yes"), (False, "No")))
+    explanation = CharFilter(lookup_expr="icontains")
+    feedback = CharFilter(lookup_expr="icontains")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -99,7 +115,6 @@ class UserSubmissionFilter(FilterSet):
             "task",
             "submitter",
             "accepted",
-            "points_override",
             "explanation",
             "feedback",
         ]
