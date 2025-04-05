@@ -1,0 +1,73 @@
+{% load static %}
+{% load i18n %}
+
+<div class="row">
+    <div class="col-6">
+        <div class="card">
+            <div class="card-header"><h5 class="card-title">{% trans "Available Tasks" %}</h5></div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush" id="unselected_tasks">
+                    {% for task in widget.unselected_tasks %}<li class="list-group-item" value="{{ task.pk }}">{{ task.task }}</li>{% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="card">
+            <div class="card-header"><h5 class="card-title">{% trans "Selected Tasks" %}</h5></div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush" id="selected_tasks">
+                    {% for task in widget.selected_tasks %}<li class="list-group-item"  value="{{ task.pk }}">{{ task.task }}</li>{% endfor %}
+        </ul>
+    </div>
+    </div>
+    </div>
+</div>
+
+<!-- This is the actual form element, it will be populated on submit -->
+<select name="{{ widget.name }}" {% include "django/forms/widgets/attrs.html" %} hidden></select>
+
+<script src="{% static "dist/js/Sortable.min.js" %}"></script>
+<script>
+    const selected = document.getElementById('selected_tasks');
+    const unselected = document.getElementById('unselected_tasks');
+    const selectEl = document.getElementById('{{ widget.attrs.id }}');
+    const form = selectEl.closest("form");
+
+
+    new Sortable(selected, {
+        group: {
+            name: 'tasks',
+            pull: true,
+            put: true
+        },
+        multiDrag: true,
+        selectedClass: "active",
+        animation: 150,
+    });
+
+    new Sortable(unselected, {
+        group: {
+            name: 'tasks',
+            pull: true,
+            put: true
+        },
+        multiDrag: true,
+        selectedClass: "active",
+        animation: 150,
+    });
+
+    form.addEventListener("submit", function() {
+        console.log("here")
+        // Clear all existing options
+        selectEl.innerHTML = "";
+
+        // Add current selection in order
+        [...selected.children].forEach((li) => {
+            const inner = li.innerHTML;
+            const id = li.value;
+            const option = new Option(inner, id, true, true);
+            selectEl.appendChild(option);
+        });
+    });
+</script>

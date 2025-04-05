@@ -4,12 +4,29 @@ from crispy_forms.layout import Submit
 from django import forms
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.db.models import Count
+from django.db.models import Count, OuterRef, Subquery
 from django.utils.translation import gettext_lazy as _
 
 from utilities.templatetags.utilities_media import get_main_mime_type
 
 from .models import Game, OrderedTask, Player, PlayerGroup, Submission, Task
+
+
+class TaskSelectWidget(forms.SelectMultiple):
+    template_name = "generic/task_select_widget.html"
+
+    def __init__(self, *args, game=None, **kwargs):
+        self.game = game
+        super().__init__(*args, **kwargs)
+
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
+        selected = self.game.tasks.annotate(
+            task_number=Subquery(OrderedTask.objects.filter(game=self.game, task__pk=OuterRef("pk")).values("task_number"))
+        ).order_by("task_number")
+        unselected = Task.objects.exclude(id__in=selected.values_list("id", flat=True))
+        context["widget"].update({"selected_tasks": selected, "unselected_tasks": unselected})
+        return context
 
 
 class MultipleFileInput(forms.ClearableFileInput):
@@ -52,6 +69,23 @@ class GameForm(forms.ModelForm):
         self.helper.title = "Game"
         self.helper.add_input(Submit("save", _("Save")))
 
+        self.fields["tasks"].widget = TaskSelectWidget(game=self.instance)
+
+    def save(self, commit=True):
+        # Save the game first including all m2m relationships
+        game = super().save(commit=commit)
+
+        # Update order, only possible if the m2m relationships exist, which is the case
+        # if we have commited them just above
+        if commit:
+            for index, task_id in enumerate(self.data.getlist("tasks")):
+                ordered_task = OrderedTask.objects.get(game=game, task_id=task_id)
+                ordered_task.task_number = index + 1
+                ordered_task.full_clean()
+                ordered_task.save()
+
+        return game
+
     class Meta:
         model = Game
         fields = [
@@ -71,7 +105,6 @@ class GameForm(forms.ModelForm):
                     users=", ".join(str(Player.objects.get(pk=id)) for id, _ in duplicates)
                 )
             )
-        print(groups)
         return groups
 
 

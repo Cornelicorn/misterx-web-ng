@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.forms",
     "debug_toolbar",
     "django_filters",
     "guardian",
@@ -201,6 +202,8 @@ DJANGO_TABLES2_TABLE_ATTRS = {
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 
 CRISPY_TEMPLATE_PACK = "bootstrap5"
+
+FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
 MEDIA_ROOT = getattr(local_settings, "MEDIA_ROOT", BASE_DIR / "media")
 

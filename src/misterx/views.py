@@ -63,6 +63,23 @@ class GameEditView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     template_name = "generic/object_edit.html"
     form_class = GameForm
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        game = self.get_object()
+        selected_tasks = game.tasks.annotate(
+            task_number=models.Subquery(
+                OrderedTask.objects.filter(game=game, task__pk=models.OuterRef("pk")).values("task_number")
+            )
+        ).order_by("task_number")
+        unselected_tasks = Task.objects.exclude(pk__in=selected_tasks.values_list("pk", flat=True))
+        context.update(
+            {
+                "selected_tasks": selected_tasks,
+                "unselected_tasks": unselected_tasks,
+            }
+        )
+        return context
+
 
 class GameDetailView(LoginRequiredMixin, PermissionRequiredMixin, MultiTableMixin, DetailView):
     model = Game
