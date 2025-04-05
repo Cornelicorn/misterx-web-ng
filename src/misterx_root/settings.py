@@ -214,3 +214,13 @@ DEFAULT_ALLOWED_UPLOADS = (
     "video",
 )
 ALLOWED_UPLOADS = getattr(local_settings, "ALLOWED_UPLOADS", DEFAULT_ALLOWED_UPLOADS)
+
+if email_config := getattr(local_settings, "EMAIL_CONFIG", None):
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+    EMAIL_HOST = email_config.get("host", None)
+    EMAIL_PORT = email_config.get("port", 465)
+    EMAIL_USE_TLS = email_config.get("use_tls", False)
+    EMAIL_USE_SSL = email_config.get("use_ssl", True)
+    EMAIL_HOST_USER = email_config.get("user", None)
+    EMAIL_HOST_PASSWORD = email_config.get("password", None)
+    DEFAULT_FROM_EMAIL = email_config.get("from_email")

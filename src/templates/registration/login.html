@@ -1,6 +1,7 @@
 {% extends "base/base.html" %}
 
 {% load crispy_forms_tags %}
+{% load i18n %}
 
 {% block body %}
     <br>
@@ -10,17 +11,16 @@
                 {% if user.is_authenticated %}
                     <div class="card">
                         <div class="alert alert-important alert-danger mb-0">
-                            <h4 class="alert-title">Insufficient permissions.</h4>
+                            <h4 class="alert-title">{% trans "Insufficient permissions." %}</h4>
                             <div class="text-muted">
-                                Your account doesn't have access to this page. To proceed,
-                                please login with an account that has access.
+                                {% trans "Your account doesn't have access to this page. To proceed, please login with an account that has access." %}
                             </div>
                         </div>
                     </div>
                 {% else %}
                     <div class="card">
                         <div class="alert alert-important alert-warning mb-0">
-                            <h4 class="alert-title">Please login to see this page.</h4>
+                            <h4 class="alert-title">{% trans "Please login to see this page." %}</h4>
                         </div>
                     </div>
                 {% endif %}
@@ -28,11 +28,12 @@
 
             <div class="card">
                 <div class="card-header">
-                    <h1 class="card-title">Login</h1>
+                    <h1 class="card-title">{% trans "Login" %}</h1>
                 </div>
                 <div class="card-body">{% crispy form form.helper %}</div>
                 <div class="card-footer">
                     <input type="hidden" name="next" value="{{ next }}" />
+                    <a class="btn btn-danger w-100 mb-4" href="{% url "password_reset" %}">{% trans "Reset password" %}</a>
                     {% if use_sso %}
                         <a class="btn btn-secondary w-100" href="{% url "social:begin" "oidc" %}">Volucra SSO</a>
                     {% endif %}

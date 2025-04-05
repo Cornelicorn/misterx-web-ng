@@ -1,18 +1,20 @@
 {% extends "base/base.html" %}
 
+{% load i18n %}
+
 {% block body %}
     <div class="page page-center">
         <div class="container container-tight py-5">
             <div class="card">
                 <div class="card-header">
-                    <h2 class="card-title">You have been logged out</h2>
+                    <h2 class="card-title">{% trans "You have been logged out" %}</h2>
                 </div>
                 <div class="card-body">
-                    <p>You can login again by pressing the button below.</p>
+                    <p>{% trans "You can login again by pressing the button below." %}</p>
                 </div>
                 <div class="card-footer">
-                    <a href="{% if use_sso %}{% url "social:begin" "oidc" %}{% else %}{% url "login" %}{% endif %}"
-                       class="btn btn-primary w-100">Login</a>
+                    <a href="{% url "login" %}"
+                       class="btn btn-primary w-100">{% trans "Login" %}</a>
                 </div>
             </div>
         </div>

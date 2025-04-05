@@ -39,3 +39,10 @@ TIME_ZONE = "UTC"
 SOCIAL_AUTH_OIDC_OIDC_ENDPOINT = None
 SOCIAL_AUTH_OIDC_KEY = None
 SOCIAL_AUTH_OIDC_SECRET = None
+
+# EMAIL_CONFIG = {
+#     "host": "",
+#     "user": "",
+#     "password": "",
+#     "from_email": "",
+# }
