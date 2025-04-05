@@ -16,14 +16,12 @@ Including another URLconf
 """
 
 from debug_toolbar.toolbar import debug_toolbar_urls
-from django.conf import settings
-from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import include, path
 
 from .forms import LoginForm
-from .views import login_or_redirect, serve_protected_media
+from .views import login_or_redirect
 
 urlpatterns = [
     path("", include("social_django.urls", namespace="social")),
@@ -43,4 +41,4 @@ urlpatterns = [
         name="logout",
     ),
     path("", include("misterx.urls")),
-] + debug_toolbar_urls() + static(settings.MEDIA_URL, view=serve_protected_media, document_root=settings.MEDIA_ROOT)
+] + debug_toolbar_urls()

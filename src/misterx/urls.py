@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.conf.urls.static import static
 from django.urls import path
 
 from .views import (
@@ -32,6 +34,7 @@ from .views import (
     UserSubmissionListView,
     UserSubmissionView,
     UserTaskListView,
+    serve_proofs,
 )
 
 urlpatterns = [
@@ -66,6 +69,6 @@ urlpatterns = [
     path("user/submit/", UserSubmissionView.as_view(), name="user-submission-create"),
     path("user/submissions/", UserSubmissionListView.as_view(), name="user-submission-list"),
     path("user/submissions/<slug:pk>", UserSubmissionDetailView.as_view(), name="user-submission-detail"),
-]
+] + static(settings.MEDIA_URL, view=serve_proofs, document_root=settings.MEDIA_ROOT)
 
 app_name = "misterx"

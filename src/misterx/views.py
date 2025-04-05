@@ -1,8 +1,11 @@
+from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.db import models
+from django.http import HttpResponse
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import DeleteView, DetailView, UpdateView
+from django.views.static import serve
 from django_filters.views import FilterView
 from django_tables2 import MultiTableMixin, SingleTableMixin
 from guardian.mixins import LoginRequiredMixin, PermissionListMixin, PermissionRequiredMixin
@@ -496,3 +499,34 @@ class UserTaskListView(LoginRequiredMixin, SingleTableMixin, FilterView):
         except NoActiveGameError:
             resp = render(request, "misterx/no_active_game.html")
         return resp
+
+
+def serve_proofs(request, *args, **kwargs):
+    user = request.user
+    if user.is_authenticated:
+        # Fetch upload object for the file
+        try:
+            upload = Upload.objects.get(file=request.path.removeprefix(settings.MEDIA_URL))
+        except ObjectDoesNotExist:
+            return HttpResponse(status=403)
+
+        # Check if user is in the group of the submission or if they are staff
+        # Otherwise return 403
+        allowed_group = upload.submission.group
+        if allowed_group in user.groups.all():
+            pass
+        elif user.is_staff:
+            pass
+        else:
+            return HttpResponse(status=403)
+
+        # Finally, serve the file
+        if settings.DEBUG:
+            return serve(request, *args, **kwargs)
+        else:
+            response = HttpResponse()
+            response['Content-Type'] = ''
+            response['X-Accel-Redirect'] = request.path
+            return response
+    else:
+        return HttpResponse(status=403)
