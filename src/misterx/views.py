@@ -289,7 +289,7 @@ class SubmissionDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteVi
 
 class PlayerListView(LoginRequiredMixin, PermissionListMixin, SingleTableMixin, FilterView):
     model = Player
-    permission_required = "misterx.view_player"
+    permission_required = "auth.view_user"
     table_class = PlayerTable
     template_name = "misterx/player_list.html"
     filterset_class = PlayerFilter
@@ -297,7 +297,7 @@ class PlayerListView(LoginRequiredMixin, PermissionListMixin, SingleTableMixin, 
 
 class PlayerCreateView(LoginRequiredMixin, PermissionRequiredMixin, InitialCreateView):
     model = Player
-    permission_required = "misterx.add_player"
+    permission_required = "auth.add_user"
     permission_object = None
     template_name = "generic/object_create.html"
     form_class = PlayerForm
@@ -305,14 +305,14 @@ class PlayerCreateView(LoginRequiredMixin, PermissionRequiredMixin, InitialCreat
 
 class PlayerEditView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = Player
-    permission_required = "misterx.change_player"
+    permission_required = "auth.change_user"
     template_name = "generic/object_edit.html"
     form_class = PlayerForm
 
 
 class PlayerDetailView(LoginRequiredMixin, PermissionRequiredMixin, MultiTableMixin, DetailView):
     model = Player
-    permission_required = "misterx.view_player"
+    permission_required = "auth.view_user"
     tables = PlayerGroupTable, GameTable
 
     def get_tables_data(self):
@@ -329,14 +329,14 @@ class PlayerDetailView(LoginRequiredMixin, PermissionRequiredMixin, MultiTableMi
 
 class PlayerDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     model = Player
-    permission_required = "misterx.delete_player"
+    permission_required = "auth.delete_user"
     success_url = reverse_lazy("misterx:player-list")
     template_name = "generic/object_confirm_delete.html"
 
 
 class PlayerGroupListView(LoginRequiredMixin, PermissionListMixin, SingleTableMixin, FilterView):
     model = PlayerGroup
-    permission_required = "misterx.view_playergroup"
+    permission_required = "auth.view_group"
     table_class = PlayerGroupTable
     template_name = "misterx/playergroup_list.html"
     filterset_class = PlayerGroupFilter
@@ -344,7 +344,7 @@ class PlayerGroupListView(LoginRequiredMixin, PermissionListMixin, SingleTableMi
 
 class PlayerGroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, InitialCreateView):
     model = PlayerGroup
-    permission_required = "misterx.add_playergroup"
+    permission_required = "auth.add_group"
     permission_object = None
     template_name = "generic/object_create.html"
     form_class = PlayerGroupForm
@@ -352,14 +352,14 @@ class PlayerGroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, Initial
 
 class PlayerGroupEditView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = PlayerGroup
-    permission_required = "misterx.change_playergroup"
+    permission_required = "auth.change_group"
     template_name = "generic/object_edit.html"
     form_class = PlayerGroupForm
 
 
 class PlayerGroupDetailView(LoginRequiredMixin, PermissionRequiredMixin, MultiTableMixin, DetailView):
     model = PlayerGroup
-    permission_required = "misterx.view_playergroup"
+    permission_required = "auth.view_group"
     tables = PlayerTable, GameTable
 
     def get_tables_data(self):
@@ -376,7 +376,7 @@ class PlayerGroupDetailView(LoginRequiredMixin, PermissionRequiredMixin, MultiTa
 
 class PlayerGroupDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     model = PlayerGroup
-    permission_required = "misterx.delete_playergroup"
+    permission_required = "auth.delete_group"
     success_url = reverse_lazy("misterx:playergroup-list")
     template_name = "generic/object_confirm_delete.html"
 
