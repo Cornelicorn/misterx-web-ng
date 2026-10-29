@@ -149,8 +149,10 @@ SOCIAL_AUTH_PIPELINE = (
     "utilities.auth_pipeline.oidc.assign_groups_and_attributes",
 )
 
-LOGIN_REDIRECT_URL = "/user/submit"
-LOGIN_REDIRECT_URL_STAFF = "/games"
+# Redirect to the start page after login, which redirects players and staff to their respective start page
+LOGIN_REDIRECT_URL = "/"
+LOGIN_REDIRECT_URL_PLAYER = "/user/submit/"
+LOGIN_REDIRECT_URL_STAFF = "/games/"
 
 # 4 hours in seconds
 SESSION_COOKIE_AGE = 4 * 60 * 60
