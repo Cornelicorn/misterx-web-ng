@@ -102,10 +102,13 @@ class GameForm(forms.ModelForm):
     # Check if any user is present in multiple of the selected groups
     def clean_groups(self):
         groups = self.cleaned_data["groups"]
-        if duplicates := groups.values_list("user").annotate(occurences=Count("id")).exclude(occurences=1):
+        duplicates = (
+            groups.filter(user__isnull=False).values_list("user").annotate(occurrences=Count("id")).exclude(occurrences=1)
+        )
+        if duplicates:
             raise ValidationError(
                 _("These users are present in multiple groups: {users}").format(
-                    users=", ".join(str(Player.objects.get(pk=id)) for id, _ in duplicates)
+                    users=", ".join(str(Player.objects.get(pk=user_id)) for user_id, _count in duplicates)
                 )
             )
         return groups
@@ -218,10 +221,13 @@ class PlayerForm(forms.ModelForm):
 
     def clean_groups(self):
         data = self.cleaned_data["groups"]
-        if duplicates := data.values_list("games").annotate(occurences=Count("id")).exclude(occurences=1):
+        duplicates = (
+            data.filter(games__isnull=False).values_list("games").annotate(occurrences=Count("id")).exclude(occurrences=1)
+        )
+        if duplicates:
             raise ValidationError(
                 _("The selected groups conflict in these games: {games}").format(
-                    games=", ".join(str(Game.objects.get(pk=id)) for id, _ in duplicates)
+                    games=", ".join(str(Game.objects.get(pk=game_id)) for game_id, _count in duplicates)
                 )
             )
         return data
