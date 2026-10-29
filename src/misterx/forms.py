@@ -4,7 +4,7 @@ from crispy_forms.layout import Submit
 from django import forms
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.db.models import Count, OuterRef, Subquery
+from django.db.models import Count
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
@@ -16,19 +16,14 @@ from .models import Game, OrderedTask, Player, PlayerGroup, Submission, Task
 class TaskSelectWidget(forms.SelectMultiple):
     template_name = "generic/task_select_widget.html"
 
-    def __init__(self, *args, game=None, **kwargs):
-        self.game = game
-        super().__init__(*args, **kwargs)
-
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
-        if self.game.pk:
-            selected = self.game.tasks.annotate(
-                task_number=Subquery(OrderedTask.objects.filter(game=self.game, task__pk=OuterRef("pk")).values("task_number"))
-            ).order_by("task_number")
-        else:
-            selected = Task.objects.none()
-        unselected = Task.objects.exclude(id__in=selected.values_list("id", flat=True))
+        # Show the selected tasks in the order of the value, which is the order of the saved game or,
+        # if the form is shown again because it was invalid, the submitted order
+        selected_ids = [int(pk) for pk in context["widget"]["value"] if pk.isdigit()]
+        tasks = Task.objects.in_bulk(selected_ids)
+        selected = [tasks[pk] for pk in selected_ids if pk in tasks]
+        unselected = Task.objects.exclude(id__in=tasks.keys())
         context["widget"].update({"selected_tasks": selected, "unselected_tasks": unselected})
         return context
 
@@ -78,7 +73,9 @@ class GameForm(forms.ModelForm):
         self.helper.title = _("Game")
         self.helper.add_input(Submit("save", _("Save")))
 
-        self.fields["tasks"].widget = TaskSelectWidget(game=self.instance)
+        self.fields["tasks"].widget = TaskSelectWidget()
+        if self.instance.pk:
+            self.initial["tasks"] = list(OrderedTask.objects.filter(game=self.instance).values_list("task_id", flat=True))
 
     def save(self, commit=True):
         # Save the game first including all m2m relationships
