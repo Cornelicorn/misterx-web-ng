@@ -73,7 +73,7 @@ urlpatterns = [
     re_path(
         r"^{prefix}(?P<path>.*)$".format(prefix=re.escape(settings.MEDIA_URL.lstrip("/"))),
         serve_proofs,
-        kwargs={"document_root": settings.MEDIA_ROOT}
+        kwargs={"document_root": settings.MEDIA_ROOT},
     ),
 ]
 

@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Count, UniqueConstraint
+from django.db.models import UniqueConstraint
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
@@ -130,7 +130,12 @@ class Submission(models.Model):
 
     @property
     def granted_points(self) -> int:
-        first_accepted = Submission.objects.filter(game=self.game, task=self.task, group=self.group).order_by("time").filter(accepted=True).first()
+        first_accepted = (
+            Submission.objects.filter(game=self.game, task=self.task, group=self.group)
+            .order_by("time")
+            .filter(accepted=True)
+            .first()
+        )
         if not self.accepted:
             return 0
         elif self.points_override is not None:
