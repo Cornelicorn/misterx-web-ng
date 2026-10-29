@@ -472,17 +472,13 @@ def serve_proofs(request, *args, **kwargs):
         try:
             upload = Upload.objects.get(file=request.path.removeprefix(settings.MEDIA_URL))
         except ObjectDoesNotExist:
-            return HttpResponse(status=403)
+            raise PermissionDenied()
 
         # Check if user is in the group of the submission or if they are staff
         # Otherwise return 403
         allowed_group = upload.submission.group
-        if allowed_group in user.groups.all():
-            pass
-        elif user.is_staff:
-            pass
-        else:
-            return HttpResponse(status=403)
+        if allowed_group not in user.groups.all() and not user.is_staff:
+            raise PermissionDenied()
 
         # Finally, serve the file
         if settings.DEBUG:
@@ -493,4 +489,4 @@ def serve_proofs(request, *args, **kwargs):
             response["X-Accel-Redirect"] = "/protected_media/" + request.path
             return response
     else:
-        return HttpResponse(status=403)
+        raise PermissionDenied()
