@@ -80,7 +80,7 @@ class OrderedTaskTable(TaskTable):
 
 class UserTaskTable(tables.Table):
     task_number = tables.Column(attrs={"th": {"class": "w-1"}})
-    completed = tables.BooleanColumn()
+    submitted = tables.BooleanColumn()
     add = AddSubmissionForTaskColumn()
 
     class Meta:
@@ -89,7 +89,7 @@ class UserTaskTable(tables.Table):
             "task_number",
             "task",
             "points",
-            "completed",
+            "submitted",
         ]
 
 
