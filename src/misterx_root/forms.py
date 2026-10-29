@@ -41,4 +41,4 @@ class SetPasswordForm(auth_forms.SetPasswordForm):
         self.helper = FormHelper()
         self.helper.form_id = "id_passwordSetForm"
         self.helper.form_method = "post"
-        self.helper.add_input(Submit("Set", _("Set Password"), css_class="form-footer w-100"))
+        self.helper.add_input(Submit("set", _("Set Password"), css_class="form-footer w-100"))

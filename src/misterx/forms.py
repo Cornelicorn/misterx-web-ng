@@ -41,11 +41,11 @@ class MultipleFileField(forms.FileField):
         kwargs.setdefault("widget", MultipleFileInput())
         super().__init__(*args, **kwargs)
 
-    def single_file_clean(self, data, inital):
+    def single_file_clean(self, data, initial):
         mime_type = get_main_mime_type(data)
         if mime_type not in settings.ALLOWED_UPLOADS:
             raise ValidationError(_("The file type {mime_type} is not supported.").format(mime_type=mime_type))
-        return super().clean(data, inital)
+        return super().clean(data, initial)
 
     def clean(self, data, initial=None):
         if isinstance(data, list | tuple):

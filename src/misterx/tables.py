@@ -51,7 +51,6 @@ class GameTable(tables.Table):
 class TaskTable(tables.Table):
     open = OpenColumn("misterx:task-detail")
     edit = EditColumn("misterx:task-edit")
-    per_page = 1
 
     class Meta:
         model = Task
