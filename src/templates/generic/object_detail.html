@@ -3,7 +3,7 @@
 
 {% block content %}
     <header class="page-header">
-        <div class="row">
+        <div class="row g-2 align-items-center">
             <div class="col">
                 <div class="page-pretitle">
 
@@ -20,11 +20,13 @@
 
                 </h1>
             </div>
-            <div class="col-auto pull-right">
+            <div class="col-12 col-md-auto">
+                <div class="btn-list">
 
-                {% block object_buttons %}
-                {% endblock object_buttons %}
+                    {% block object_buttons %}
+                    {% endblock object_buttons %}
 
+                </div>
             </div>
         </div>
     </header>
