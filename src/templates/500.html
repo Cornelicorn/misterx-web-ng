@@ -1,13 +1,14 @@
 {% extends "base/error_400.html" %}
+{% load i18n %}
 
 {% block status_code %}
     500
 {% endblock status_code %}
 
 {% block error_title %}
-    Internal Server error
+    {% trans "Internal Server Error" %}
 {% endblock error_title %}
 
 {% block error_subtitle %}
-    The server is having a problem loading this page.
+    {% trans "The server is having a problem loading this page." %}
 {% endblock error_subtitle %}

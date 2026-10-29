@@ -17,7 +17,7 @@
                     {% endblock error_title %}
 
                 </p>
-                <p class="empty-subtitle text-muted">
+                <p class="empty-subtitle text-secondary">
 
                     {% block error_subtitle %}
                     {% endblock error_subtitle %}
@@ -26,7 +26,7 @@
                 <div class="empty-action">
 
                     {% block action %}
-                        <a class="btn btn-primary" onclick="javascript:history.back();">{% trans "Take me back" %}</a>
+                        <button type="button" class="btn btn-primary" onclick="history.back();">{% trans "Take me back" %}</button>
                     {% endblock action %}
 
                 </div>

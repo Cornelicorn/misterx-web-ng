@@ -1,13 +1,14 @@
 {% extends "base/error_400.html" %}
+{% load i18n %}
 
 {% block status_code %}
     403
 {% endblock status_code %}
 
 {% block error_title %}
-    Forbidden
+    {% trans "Forbidden" %}
 {% endblock error_title %}
 
 {% block error_subtitle %}
-    You are not allowed to access the requested resource.
+    {% trans "You are not allowed to access the requested resource." %}
 {% endblock error_subtitle %}
