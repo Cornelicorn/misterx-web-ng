@@ -49,6 +49,11 @@ class MultipleFileField(forms.FileField):
         return super().clean(data, initial)
 
     def clean(self, data, initial=None):
+        # Without any files the single file checks never run, so check required here
+        if not data:
+            if self.required:
+                raise ValidationError(self.error_messages["required"], code="required")
+            return []
         if isinstance(data, list | tuple):
             result = [self.single_file_clean(d, initial) for d in data]
         else:
