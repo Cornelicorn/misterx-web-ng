@@ -1,14 +1,12 @@
 function updateTheme() {
-    let saved_theme
-    let theme
-    let icon
-    saved_theme = localStorage.getItem("misterx_theme");
+    let theme = "light";
+    let icon;
+    const saved_theme = localStorage.getItem("misterx_theme");
     if (saved_theme == "light") {
         icon = "ti ti-sun";
-        theme = "light";
     } else if (saved_theme == "dark") {
         icon = "ti ti-moon";
-        theme = "dark"
+        theme = "dark";
     } else {
         icon = "ti ti-sun-moon";
         if (window.matchMedia('(prefers-color-scheme: dark)').matches) {

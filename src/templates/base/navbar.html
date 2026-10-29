@@ -8,7 +8,7 @@
             <a class="navbar-brand" href="{% url "misterx:user-submission-create" %}">Mister X</a>
         {% endif %}
 
-        <div class="d-s-flex d-md-none dropdown ms-auto me-2 nav-item">
+        <div class="d-md-none dropdown ms-auto me-2 nav-item">
             <a id="id_theme_dropdown_mobile"
                href="#"
                class="nav-link dropdown-toggle"
@@ -21,13 +21,15 @@
             <div class="dropdown-menu dropdown-menu-end"
                  data-bs-popper="none"
                  aria-labelledby="id_theme_dropdown_mobile">
-                <a name="auto" class="dropdown-item" onclick="javascript:setTheme('auto');">{% trans "Auto" %}</a>
-                <a name="light" class="dropdown-item" onclick="javascript:setTheme('light');">
+                <button type="button" class="dropdown-item" onclick="setTheme('auto');">
+                    {% trans "Auto" %} <i class="ti ti-sun-moon ms-2"></i>
+                </button>
+                <button type="button" class="dropdown-item" onclick="setTheme('light');">
                     {% trans "Light" %} <i class="ti ti-sun ms-2"></i>
-                </a>
-                <a name="dark" class="dropdown-item" onclick="javascript:setTheme('dark');">
+                </button>
+                <button type="button" class="dropdown-item" onclick="setTheme('dark');">
                     {% trans "Dark" %} <i class="ti ti-moon ms-2"></i>
-                </a>
+                </button>
             </div>
         </div>
 
@@ -63,19 +65,19 @@
                     </li>
                     <li class="nav-item
                                {% if request.resolver_match.url_name == 'playergroup-list' %}active" aria-current="true{% endif %}">
-                        <a href="{% url "misterx:playergroup-list" %}" class="nav-link">{% trans "Playergroup List" %}</a>
+                        <a href="{% url "misterx:playergroup-list" %}" class="nav-link">{% trans "Playergroups List" %}</a>
                     </li>
                     {% else %}
                     <li class="nav-item
-                        {% if request.resolver_match.url_name == 'user-task-list' %}active" aria-current="true{% endif %}">
+                               {% if request.resolver_match.url_name == 'user-task-list' %}active" aria-current="true{% endif %}">
                         <a href="{% url "misterx:user-task-list" %}" class="nav-link">{% trans "List Tasks" %}</a>
                     </li>
                     <li class="nav-item
-                        {% if request.resolver_match.url_name == 'user-submission-create' %}active" aria-current="true{% endif %}">
+                               {% if request.resolver_match.url_name == 'user-submission-create' %}active" aria-current="true{% endif %}">
                         <a href="{% url "misterx:user-submission-create" %}" class="nav-link">{% trans "Submit a Task" %}</a>
                     </li>
                     <li class="nav-item
-                        {% if request.resolver_match.url_name == 'user-submission-list' %}active" aria-current="true{% endif %}">
+                               {% if request.resolver_match.url_name == 'user-submission-list' %}active" aria-current="true{% endif %}">
                         <a href="{% url "misterx:user-submission-list" %}" class="nav-link">{% trans "List Submissions" %}</a>
                     </li>
                     {% endif %}
@@ -96,21 +98,23 @@
                     <div class="dropdown-menu dropdown-menu-end"
                          data-bs-popper="none"
                          aria-labelledby="id_theme_dropdown">
-                        <a name="auto" class="dropdown-item" onclick="javascript:setTheme('auto');">{% trans "Auto" %}</a>
-                        <a name="light" class="dropdown-item" onclick="javascript:setTheme('light');">
+                        <button type="button" class="dropdown-item" onclick="setTheme('auto');">
+                            {% trans "Auto" %} <i class="ti ti-sun-moon ms-2"></i>
+                        </button>
+                        <button type="button" class="dropdown-item" onclick="setTheme('light');">
                             {% trans "Light" %} <i class="ti ti-sun ms-2"></i>
-                        </a>
-                        <a name="dark" class="dropdown-item" onclick="javascript:setTheme('dark');">
+                        </button>
+                        <button type="button" class="dropdown-item" onclick="setTheme('dark');">
                             {% trans "Dark" %} <i class="ti ti-moon ms-2"></i>
-                        </a>
+                        </button>
                     </div>
                 </div>
                 <div class="nav-item dropdown">
                     <a href="#"
-                       class="nav-link"
+                       class="nav-link dropdown-toggle"
                        data-bs-toggle="dropdown"
-                       data-bs-autoclone="outside"
                        role="button"
+                       aria-haspopup="true"
                        aria-expanded="false">{% trans "Account" %}</a>
                     <div class="dropdown-menu dropdown-menu-end" data-bs-popper="none">
                         {% if user.is_staff %}
