@@ -1,0 +1,12 @@
+/*
+ * django-tables2 puts the sort icon classes on the <th> itself, keep the
+ * header text in the regular font and only render the icon with the icon font.
+ */
+th.ti {
+    font-family: inherit !important;
+}
+
+th.ti::before {
+    font-family: "tabler-icons" !important;
+    margin-right: 0.25rem;
+}
