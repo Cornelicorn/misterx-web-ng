@@ -257,5 +257,6 @@ class UserSubmissionForm(SubmissionForm):
             (t.task.id, str(t)) for t in OrderedTask.objects.filter(game=game, task__in=game.tasks.all())
         )
 
+    # New submissions always have to be reviewed first
     def clean_accepted(self):
-        return False
+        return None
