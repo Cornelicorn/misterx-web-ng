@@ -59,7 +59,7 @@ class Task(models.Model):
 class OrderedTask(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
     game = models.ForeignKey("Game", on_delete=models.CASCADE)
-    task_number = models.IntegerField(verbose_name="Task number", null=True, blank=True)
+    task_number = models.IntegerField(verbose_name=_("Task number"), null=True, blank=True)
 
     def __str__(self):
         return f"{self.task_number or 'Unordered'}: {self.task}"
@@ -116,7 +116,7 @@ class Submission(models.Model):
     )
     points_override = models.PositiveIntegerField(
         _("Granted points override"),
-        help_text="Override the number of points the group will receive for this submission",
+        help_text=_("Override the number of points the group will receive for this submission"),
         null=True,
         blank=True,
         default=None,
@@ -178,5 +178,5 @@ def get_upload_path(instance: "Upload", filename: str):
 
 class Upload(models.Model):
     submission = models.ForeignKey("Submission", on_delete=models.CASCADE, related_name="proofs")
-    uuid = models.UUIDField(verbose_name="UUID for upload", default=uuid.uuid4, editable=False)
-    file = models.FileField("File", upload_to=get_upload_path)
+    uuid = models.UUIDField(verbose_name=_("UUID for upload"), default=uuid.uuid4, editable=False)
+    file = models.FileField(_("File"), upload_to=get_upload_path)

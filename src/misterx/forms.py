@@ -69,7 +69,7 @@ class GameForm(forms.ModelForm):
         self.helper = FormHelper()
         self.helper.form_id = "id_gameForm"
         self.helper.form_method = "post"
-        self.helper.title = "Game"
+        self.helper.title = _("Game")
         self.helper.add_input(Submit("save", _("Save")))
 
         self.fields["tasks"].widget = TaskSelectWidget(game=self.instance)
@@ -120,7 +120,7 @@ class TaskForm(forms.ModelForm):
         self.helper = FormHelper()
         self.helper.form_id = "id_taskForm"
         self.helper.form_method = "post"
-        self.helper.title = "Task"
+        self.helper.title = _("Task")
         self.helper.add_input(Submit("save", _("Save")))
 
     class Meta:
@@ -138,7 +138,7 @@ class SubmissionForm(forms.ModelForm):
         self.helper = FormHelper()
         self.helper.form_id = "id_submissionForm"
         self.helper.form_method = "post"
-        self.helper.title = "Submission"
+        self.helper.title = _("Submission")
         self.helper.add_input(Submit("save", _("Save")))
 
     class Meta:
@@ -161,7 +161,7 @@ class SubmissionApproveForm(SubmissionForm):
         self.helper = FormHelper()
         self.helper.form_id = "id_submissionApproveForm"
         self.helper.form_method = "post"
-        self.helper.title = "Submission"
+        self.helper.title = _("Submission")
         self.helper.add_input(Submit("deny", _("Deny"), css_class="btn btn-danger w-25"))
         self.helper.add_input(Submit("accept", _("Accept"), css_class="btn btn-success w-25 float-end"))
 
@@ -206,7 +206,7 @@ class PlayerForm(forms.ModelForm):
         self.helper = FormHelper()
         self.helper.form_id = "id_playerForm"
         self.helper.form_method = "post"
-        self.helper.title = "Player"
+        self.helper.title = _("Player")
         self.helper.add_input(Submit("save", _("Save")))
 
     class Meta:
@@ -239,7 +239,7 @@ class PlayerGroupForm(forms.ModelForm):
         self.helper = FormHelper()
         self.helper.form_id = "id_playerGroupForm"
         self.helper.form_method = "post"
-        self.helper.title = "Playergroup"
+        self.helper.title = _("Playergroup")
         self.helper.add_input(Submit("save", _("Save")))
 
     class Meta:
