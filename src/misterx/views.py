@@ -53,6 +53,28 @@ class NoUnreviewedSubmissions(Exception):
     pass
 
 
+class PlayerGameMixin:
+    """
+    Provides the active game and group of the requesting player and shows a
+    notice instead of the view if the player doesn't participate in a game
+    """
+
+    def get_game_and_group(self):
+        groups = self.request.user.groups.all()
+        try:
+            game = Game.objects.filter(groups__in=groups).get(active=True)
+        except ObjectDoesNotExist:
+            raise NoActiveGameError()
+        group = game.groups.intersection(groups).first()
+        return game, group
+
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            return super().dispatch(request, *args, **kwargs)
+        except NoActiveGameError:
+            return render(request, "misterx/no_active_game.html")
+
+
 class GameListView(LoginRequiredMixin, PermissionListMixin, SingleTableMixin, FilterView):
     model = Game
     permission_required = "misterx.view_game"
@@ -240,14 +262,13 @@ class SubmissionApproveView(LoginRequiredMixin, PermissionRequiredMixin, MultiTa
             raise NoUnreviewedSubmissions
         return obj
 
-    def get(self, request, *args, **kwargs):
+    def dispatch(self, request, *args, **kwargs):
         try:
-            resp = super().get(request, *args, **kwargs)
+            return super().dispatch(request, *args, **kwargs)
         except NoActiveGameError:
-            resp = render(request, "misterx/no_active_game.html")
+            return render(request, "misterx/no_active_game.html", {"for_staff": True})
         except NoUnreviewedSubmissions:
-            resp = render(request, "misterx/no_unreviewed_submissions.html")
-        return resp
+            return render(request, "misterx/no_unreviewed_submissions.html")
 
     # Cycle back to the same view every time
     def get_success_url(self):
@@ -364,28 +385,16 @@ class PlayerGroupDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteV
     template_name = "generic/object_confirm_delete.html"
 
 
-class UserSubmissionView(LoginRequiredMixin, InitialCreateView):
+class UserSubmissionView(LoginRequiredMixin, PlayerGameMixin, InitialCreateView):
     model = Submission
     template_name = "generic/object_create.html"
     form_class = UserSubmissionForm
 
     def get_initial(self):
         initial = super().get_initial()
-        groups = self.request.user.groups.all()
-        try:
-            game = Game.objects.filter(groups__in=groups).get(active=True)
-        except ObjectDoesNotExist:
-            raise NoActiveGameError()
-        group = game.groups.intersection(groups).first()
+        game, group = self.get_game_and_group()
         initial.update({"game": game.pk, "submitter": self.request.user.pk, "group": group.pk})
         return initial
-
-    def get(self, request, *args, **kwargs):
-        try:
-            resp = super().get(request, *args, **kwargs)
-        except NoActiveGameError:
-            resp = render(request, "misterx/no_active_game.html")
-        return resp
 
     def get_success_url(self):
         return reverse_lazy("misterx:user-submission-list")
@@ -397,29 +406,17 @@ class UserSubmissionView(LoginRequiredMixin, InitialCreateView):
         return ret
 
 
-class UserSubmissionListView(LoginRequiredMixin, SingleTableMixin, FilterView):
+class UserSubmissionListView(LoginRequiredMixin, PlayerGameMixin, SingleTableMixin, FilterView):
     model = Submission
     table_class = UserSubmissionTable
     template_name = "misterx/user_submission_list.html"
     filterset_class = UserSubmissionFilter
 
     def get_queryset(self):
-        groups = self.request.user.groups.all()
-        try:
-            game = Game.objects.filter(groups__in=groups).get(active=True)
-        except ObjectDoesNotExist:
-            raise NoActiveGameError()
-        group = game.groups.intersection(groups).first()
+        game, group = self.get_game_and_group()
         qs = super().get_queryset()
         qs = qs.filter(game=game, group=group)
         return qs
-
-    def get(self, request, *args, **kwargs):
-        try:
-            resp = super().get(request, *args, **kwargs)
-        except NoActiveGameError:
-            resp = render(request, "misterx/no_active_game.html")
-        return resp
 
 
 class UserSubmissionDetailView(LoginRequiredMixin, SingleTableMixin, DetailView):
@@ -445,19 +442,14 @@ class UserSubmissionDetailView(LoginRequiredMixin, SingleTableMixin, DetailView)
         return super().get(request, *args, **kwargs)
 
 
-class UserTaskListView(LoginRequiredMixin, SingleTableMixin, FilterView):
+class UserTaskListView(LoginRequiredMixin, PlayerGameMixin, SingleTableMixin, FilterView):
     model = Task
     table_class = UserTaskTable
     template_name = "misterx/user_task_list.html"
     filterset_class = UserTaskFilter
 
     def get_queryset(self):
-        groups = self.request.user.groups.all()
-        try:
-            game = Game.objects.filter(groups__in=groups).get(active=True)
-        except ObjectDoesNotExist:
-            raise NoActiveGameError()
-        group = game.groups.intersection(groups).first()
+        game, group = self.get_game_and_group()
         qs = (
             super()
             .get_queryset()
@@ -471,13 +463,6 @@ class UserTaskListView(LoginRequiredMixin, SingleTableMixin, FilterView):
             .order_by("completed", "task_number")
         )
         return qs
-
-    def get(self, request, *args, **kwargs):
-        try:
-            resp = super().get(request, *args, **kwargs)
-        except NoActiveGameError:
-            resp = render(request, "misterx/no_active_game.html")
-        return resp
 
 
 def serve_proofs(request, *args, **kwargs):

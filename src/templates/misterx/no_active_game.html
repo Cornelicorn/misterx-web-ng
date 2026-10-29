@@ -5,7 +5,15 @@
 {% block content %}
     <main class="page-body">
         <div class="empty">
-            <p class="empty-title">{% trans "You're currently not participating in any game" %}</p>
+            {% if for_staff %}
+                <p class="empty-title">{% trans "There is currently no active game" %}</p>
+                <p class="empty-subtitle text-secondary">{% trans "Activate a game to review its submissions." %}</p>
+                <div class="empty-action">
+                    <a href="{% url "misterx:game-list" %}" class="btn btn-primary">{% trans "Games List" %}</a>
+                </div>
+            {% else %}
+                <p class="empty-title">{% trans "You're currently not participating in any game" %}</p>
+            {% endif %}
         </div>
     </main>
 {% endblock content %}
