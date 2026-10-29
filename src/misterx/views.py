@@ -320,7 +320,7 @@ class PlayerDetailView(LoginRequiredMixin, PermissionRequiredMixin, MultiTableMi
     tables = PlayerGroupTable, GameTable
 
     def get_tables_data(self):
-        groups = PlayerGroupFilter(self.request.GET, self.object.groups.all(), prefix="groups")
+        groups = PlayerGroupFilter(self.request.GET, PlayerGroup.objects.filter(user=self.object), prefix="groups")
         games = GameFilter(self.request.GET, Game.objects.filter(groups__in=groups.qs), prefix="games")
         self.filters = groups, games
         return groups.qs, games.qs
@@ -367,7 +367,7 @@ class PlayerGroupDetailView(LoginRequiredMixin, PermissionRequiredMixin, MultiTa
     tables = PlayerTable, GameTable
 
     def get_tables_data(self):
-        users = PlayerFilter(self.request.GET, self.object.user_set.all(), prefix="player")
+        users = PlayerFilter(self.request.GET, Player.objects.filter(groups=self.object), prefix="player")
         games = GameFilter(self.request.GET, self.object.games.all(), prefix="games")
         self.filters = users, games
         return users.qs, games.qs
