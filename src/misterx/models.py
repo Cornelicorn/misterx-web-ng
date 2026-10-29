@@ -76,7 +76,7 @@ class OrderedTask(models.Model):
 
 class Game(models.Model):
     tasks = models.ManyToManyField(Task, related_name="games", blank=True, through=OrderedTask)
-    name = models.CharField(_("Name of Task Set"), max_length=255, default=get_default_game_name)
+    name = models.CharField(_("Name"), max_length=255, default=get_default_game_name)
     date = models.DateField(_("Date of the game"), default=date.today)
     groups = models.ManyToManyField(PlayerGroup, related_name="games", blank=True)
     active = models.BooleanField(
