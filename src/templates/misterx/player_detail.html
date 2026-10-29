@@ -7,16 +7,22 @@
 {% endblock page-pretitle %}
 
 {% block object_buttons %}
-    <a href="{% url "misterx:player-edit" object.id %}" class="btn btn-warning">{% trans "Edit" %}</a>
-    <a href="{% url "misterx:player-delete" object.id %}" class="btn btn-danger">{% trans "Delete" %}</a>
+    <a href="{% url "misterx:player-edit" object.id %}" class="btn btn-warning">
+        <i class="ti ti-pencil me-2"></i>
+        {% trans "Edit" %}
+    </a>
+    <a href="{% url "misterx:player-delete" object.id %}" class="btn btn-danger">
+        <i class="ti ti-trash me-2"></i>
+        {% trans "Delete" %}
+    </a>
 {% endblock object_buttons %}
 
 {% block specific_content %}
     <div class="card mb-4">
         <div class="card-header">
-            <h2 class="card-title">
+            <h3 class="card-title">
                 <strong>{% trans "Player information" %}</strong>
-            </h2>
+            </h3>
         </div>
         <div class="card-body">
             <div class="datagrid">
@@ -34,7 +40,7 @@
                 </div>
                 <div class="datagrid-item">
                     <div class="datagrid-title">{% trans "Active" %}</div>
-                    <div class="datagrid-content">{{ object.is_active | yesno }}</div>
+                    <div class="datagrid-content">{{ object.is_active | yesno:_("Yes,No") }}</div>
                 </div>
             </div>
         </div>

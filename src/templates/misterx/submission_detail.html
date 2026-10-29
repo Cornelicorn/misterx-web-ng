@@ -1,15 +1,20 @@
 {% extends "generic/object_detail.html" %}
 
 {% load i18n %}
-{% load utilities_media %}
 
 {% block page-pretitle %}
     {% trans "Submission Detail" %}
 {% endblock page-pretitle %}
 
 {% block object_buttons %}
-    <a href="{% url "misterx:submission-edit" object.id %}" class="btn btn-warning">{% trans "Edit" %}</a>
-    <a href="{% url "misterx:submission-delete" object.id %}" class="btn btn-danger">{% trans "Delete" %}</a>
+    <a href="{% url "misterx:submission-edit" object.id %}" class="btn btn-warning">
+        <i class="ti ti-pencil me-2"></i>
+        {% trans "Edit" %}
+    </a>
+    <a href="{% url "misterx:submission-delete" object.id %}" class="btn btn-danger">
+        <i class="ti ti-trash me-2"></i>
+        {% trans "Delete" %}
+    </a>
 {% endblock object_buttons %}
 
 {% block specific_content %}
@@ -39,11 +44,11 @@
                 </div>
                 <div class="datagrid-item">
                     <div class="datagrid-title">{% trans "Accepted" %}</div>
-                    <div class="datagrid-content">{{ object.accepted | yesno:"Yes,No,Not yet reviewed" }}</div>
+                    <div class="datagrid-content">{{ object.accepted | yesno:_("Yes,No,Not yet reviewed") }}</div>
                 </div>
                 <div class="datagrid-item">
-                    <div class="datagrid-title">{% trans "Points overriden" %}</div>
-                    <div class="datagrid-content">{{ object.points_override | yesno:"Yes,Yes,No" }}</div>
+                    <div class="datagrid-title">{% trans "Points overridden" %}</div>
+                    <div class="datagrid-content">{{ object.points_override | yesno:_("Yes,Yes,No") }}</div>
                 </div>
                 <div class="datagrid-item">
                     <div class="datagrid-title">{% trans "Granted points" %}</div>
@@ -53,70 +58,7 @@
         </div>
     </div>
 
-    {% if object.explanation %}
-        <div class="card mb-4">
-            <div class="card-header">
-                <h3 class="card-title">
-                    <strong>{% trans "Explanation" %}</strong>
-                </h3>
-            </div>
-            <div class="card-body">
-                {{ object.explanation }}
-            </div>
-        </div>
-    {% endif %}
-
-    {% if object.feedback %}
-        <div class="card mb-4">
-            <div class="card-header">
-                <h3 class="card-title">
-                    <strong>{% trans "Feedback" %}</strong>
-                </h3>
-            </div>
-            <div class="card-body">
-                {{ object.feedback }}
-            </div>
-        </div>
-    {% endif %}
-
-
-    {% if object.proofs.count %}
-        <h2>Proofs</h2>
-        <div class="row row-cards">
-            {% for proof in object.proofs.all %}
-                {% main_mime_type proof.file as mime_type %}
-
-                {% if mime_type == "image" %}
-                    <div class="modal modal-blur fade" id="id_picture_modal_{{ proof.pk }}">
-                        <div class="modal-dialog modal-full-width">
-                            <div class="modal-content">
-                                    <img height="auto"
-                                        width="auto"
-                                        src="{{ proof.file.url }}"
-                                        alt="Proof for this submission">
-                            </div>
-                        </div>
-                    </div>
-                {% endif %}
-
-                <div class="col-sm-6 col-lg-4">
-                    <div class="card mb-4">
-                        {% if mime_type == "image" %}
-                        <img class="card-img-top card-img-bottom"
-                             height="auto"
-                             width="auto"
-                             src="{{ proof.file.url }}"
-                             data-bs-toggle="modal"
-                             data-bs-target="#id_picture_modal_{{ proof.pk }}"
-                             alt="Proof for this submission">
-                        {% elif mime_type == "video" %}
-                            <video src="{{ proof.file.url }}" class="card-img-top card-img-bottom" controls></video>
-                        {% else %}{% trans "Unsupported file type" %}{% endif %}
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-    {% endif %}
+    {% include "misterx/includes/submission_content.html" %}
 
     {% trans "This group has only submitted this task once." as empty_title %}
     {% trans "If you didn't accept it, wait for the group to submit it again." as empty_subtitle %}
