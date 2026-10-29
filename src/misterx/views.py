@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
-from django.db import models
+from django.db import models, transaction
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.urls import reverse_lazy
@@ -50,6 +50,10 @@ class NoActiveGameError(Exception):
 
 
 class NoUnreviewedSubmissions(Exception):
+    pass
+
+
+class SubmissionAlreadyReviewed(Exception):
     pass
 
 
@@ -256,8 +260,20 @@ class SubmissionApproveView(LoginRequiredMixin, PermissionRequiredMixin, MultiTa
 
         if queryset is None:
             queryset = self.get_queryset()
+        queryset = queryset.filter(game=game, accepted=None)
 
-        obj = queryset.filter(game=game, accepted=None).first()
+        # A specific submission is requested when a decision is posted for the submission the reviewer
+        # was shown. Someone else might have reviewed it in the meantime, so only take it if it is still
+        # unreviewed and lock it until the decision is saved.
+        if "pk" in self.kwargs:
+            if self.request.method == "POST":
+                queryset = queryset.select_for_update()
+            obj = queryset.filter(pk=self.kwargs["pk"]).first()
+            if obj is None:
+                raise SubmissionAlreadyReviewed
+            return obj
+
+        obj = queryset.first()
         if obj is None:
             raise NoUnreviewedSubmissions
         return obj
@@ -269,6 +285,15 @@ class SubmissionApproveView(LoginRequiredMixin, PermissionRequiredMixin, MultiTa
             return render(request, "misterx/no_active_game.html", {"for_staff": True})
         except NoUnreviewedSubmissions:
             return render(request, "misterx/no_unreviewed_submissions.html")
+        except SubmissionAlreadyReviewed:
+            return render(request, "misterx/submission_already_reviewed.html")
+
+    # Decisions always have to name the reviewed submission, see get_object()
+    def post(self, request, *args, **kwargs):
+        if "pk" not in kwargs:
+            return self.http_method_not_allowed(request, *args, **kwargs)
+        with transaction.atomic():
+            return super().post(request, *args, **kwargs)
 
     # Cycle back to the same view every time
     def get_success_url(self):

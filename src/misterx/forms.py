@@ -5,6 +5,7 @@ from django import forms
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db.models import Count, OuterRef, Subquery
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from utilities.templatetags.utilities_media import get_main_mime_type
@@ -161,6 +162,8 @@ class SubmissionApproveForm(SubmissionForm):
         self.helper = FormHelper()
         self.helper.form_id = "id_submissionApproveForm"
         self.helper.form_method = "post"
+        # Post the decision for this submission, not for whatever is first in line when submitting
+        self.helper.form_action = reverse("misterx:submission-approve", kwargs={"pk": self.instance.pk})
         self.helper.title = _("Submission")
         self.helper.add_input(Submit("deny", _("Deny"), css_class="btn btn-danger w-25"))
         self.helper.add_input(Submit("accept", _("Accept"), css_class="btn btn-success w-25 float-end"))
