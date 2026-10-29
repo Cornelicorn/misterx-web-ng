@@ -10,3 +10,15 @@ th.ti::before {
     font-family: "tabler-icons" !important;
     margin-right: 0.25rem;
 }
+
+/*
+ * Keep empty task lists of the task select widget large enough to drop
+ * tasks into them and show that the tasks can be dragged.
+ */
+.task-select-list {
+    min-height: 3rem;
+}
+
+.task-select-list .list-group-item {
+    cursor: grab;
+}

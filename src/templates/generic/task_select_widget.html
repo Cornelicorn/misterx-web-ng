@@ -4,9 +4,11 @@
 <div class="row">
     <div class="col-6">
         <div class="card">
-            <div class="card-header"><h5 class="card-title">{% trans "Available Tasks" %}</h5></div>
+            <div class="card-header">
+                <h5 class="card-title">{% trans "Available Tasks" %}</h5>
+            </div>
             <div class="card-body">
-                <ul class="list-group list-group-flush" id="unselected_tasks">
+                <ul class="list-group list-group-flush task-select-list" id="unselected_tasks">
                     {% for task in widget.unselected_tasks %}<li class="list-group-item" value="{{ task.pk }}">{{ task.task }}</li>{% endfor %}
                 </ul>
             </div>
@@ -14,13 +16,15 @@
     </div>
     <div class="col-6">
         <div class="card">
-            <div class="card-header"><h5 class="card-title">{% trans "Selected Tasks" %}</h5></div>
+            <div class="card-header">
+                <h5 class="card-title">{% trans "Selected Tasks" %}</h5>
+            </div>
             <div class="card-body">
-                <ul class="list-group list-group-flush" id="selected_tasks">
-                    {% for task in widget.selected_tasks %}<li class="list-group-item"  value="{{ task.pk }}">{{ task.task }}</li>{% endfor %}
-        </ul>
-    </div>
-    </div>
+                <ul class="list-group list-group-flush task-select-list" id="selected_tasks">
+                    {% for task in widget.selected_tasks %}<li class="list-group-item" value="{{ task.pk }}">{{ task.task }}</li>{% endfor %}
+                </ul>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -33,7 +37,6 @@
     const unselected = document.getElementById('unselected_tasks');
     const selectEl = document.getElementById('{{ widget.attrs.id }}');
     const form = selectEl.closest("form");
-
 
     new Sortable(selected, {
         group: {
@@ -58,7 +61,6 @@
     });
 
     form.addEventListener("submit", function() {
-        console.log("here")
         // Clear all existing options
         selectEl.innerHTML = "";
 
