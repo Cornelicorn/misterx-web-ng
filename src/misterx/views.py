@@ -465,7 +465,7 @@ class UserSubmissionDetailView(LoginRequiredMixin, SingleTableMixin, DetailView)
 class UserTaskListView(LoginRequiredMixin, SingleTableMixin, FilterView):
     model = Task
     table_class = UserTaskTable
-    template_name = "misterx/task_list.html"
+    template_name = "misterx/user_task_list.html"
     filterset_class = UserTaskFilter
 
     def get_queryset(self):
