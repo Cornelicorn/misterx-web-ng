@@ -467,11 +467,7 @@ class UserTaskListView(LoginRequiredMixin, SingleTableMixin, FilterView):
                     OrderedTask.objects.filter(game=game, task__pk=models.OuterRef("pk")).values("task_number")
                 )
             )
-            .annotate(
-                completed=models.Subquery(
-                    models.Exists(Submission.objects.filter(game=game, group=group, task__pk=models.OuterRef("pk")))
-                )
-            )
+            .annotate(completed=models.Exists(Submission.objects.filter(game=game, group=group, task__pk=models.OuterRef("pk"))))
             .order_by("completed", "task_number")
         )
         return qs
