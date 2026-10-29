@@ -415,11 +415,12 @@ class UserSubmissionView(LoginRequiredMixin, PlayerGameMixin, InitialCreateView)
     template_name = "generic/object_create.html"
     form_class = UserSubmissionForm
 
-    def get_initial(self):
-        initial = super().get_initial()
+    # The player only chooses the task, everything else about the submission is set here
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
         game, group = self.get_game_and_group()
-        initial.update({"game": game.pk, "submitter": self.request.user.pk, "group": group.pk})
-        return initial
+        kwargs["instance"] = Submission(game=game, group=group, submitter_id=self.request.user.pk)
+        return kwargs
 
     def get_success_url(self):
         return reverse_lazy("misterx:user-submission-list")

@@ -257,15 +257,18 @@ class UserSubmissionForm(SubmissionForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for field in "game", "group", "accepted", "submitter", "points_override", "feedback":
-            self.fields[field].widget = forms.HiddenInput()
 
-        # Limit displayed tasks to the tasks in the given game
-        game = Game.objects.get(pk=kwargs.get("initial").get("game"))
+        # Limit displayed tasks to the tasks in the game of the submission
+        game = self.instance.game
         self.fields["task"].choices = (
             (t.task.id, str(t)) for t in OrderedTask.objects.filter(game=game, task__in=game.tasks.all())
         )
 
-    # New submissions always have to be reviewed first
-    def clean_accepted(self):
-        return None
+    # Game, group and submitter are set by the view and new submissions stay unreviewed, they must not
+    # be form fields, as players could change them in the submitted data otherwise.
+    class Meta:
+        model = Submission
+        fields = [
+            "task",
+            "explanation",
+        ]
