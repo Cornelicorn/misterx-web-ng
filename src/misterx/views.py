@@ -104,7 +104,7 @@ class GameDetailView(LoginRequiredMixin, PermissionRequiredMixin, MultiTableMixi
     tables = GamePlayerGroupTable, OrderedTaskTable, SubmissionTable
 
     def get_tables_data(self):
-        game = self.get_object()
+        game = self.object
         groups = PlayerGroupFilter(self.request.GET, game.groups.all(), prefix="groups")
         tasks = TaskFilter(
             self.request.GET,
@@ -161,8 +161,8 @@ class TaskDetailView(LoginRequiredMixin, PermissionRequiredMixin, MultiTableMixi
     tables = GameTable, SubmissionTable
 
     def get_tables_data(self):
-        games = GameFilter(self.request.GET, self.get_object().games.all(), prefix="games")
-        submissions = SubmissionFilter(self.request.GET, self.get_object().submissions.all(), prefix="submissions")
+        games = GameFilter(self.request.GET, self.object.games.all(), prefix="games")
+        submissions = SubmissionFilter(self.request.GET, self.object.submissions.all(), prefix="submissions")
         self.filters = games, submissions
         return games.qs, submissions.qs
 
@@ -212,7 +212,7 @@ class SubmissionDetailView(LoginRequiredMixin, PermissionRequiredMixin, MultiTab
     tables = SubmissionTable, SubmissionTable
 
     def get_tables_data(self):
-        obj = self.get_object()
+        obj = self.object
         own_submissions = Submission.objects.filter(game=obj.game, task=obj.task, group=obj.group).exclude(pk=obj.pk)
         other_submissions = Submission.objects.filter(game=obj.game, task=obj.task).exclude(group=obj.group)
         own_submissions_filter = SubmissionFilter(self.request.GET, own_submissions, prefix="own")
@@ -235,7 +235,7 @@ class SubmissionApproveView(LoginRequiredMixin, PermissionRequiredMixin, MultiTa
     tables = SubmissionTable, SubmissionTable
 
     def get_tables_data(self):
-        obj = self.get_object()
+        obj = self.object
         own_submissions = Submission.objects.filter(game=obj.game, task=obj.task, group=obj.group).exclude(pk=obj.pk)
         other_submissions = Submission.objects.filter(game=obj.game, task=obj.task).exclude(group=obj.group)
         own_submissions_filter = SubmissionFilter(self.request.GET, own_submissions, prefix="own")
@@ -320,7 +320,7 @@ class PlayerDetailView(LoginRequiredMixin, PermissionRequiredMixin, MultiTableMi
     tables = PlayerGroupTable, GameTable
 
     def get_tables_data(self):
-        groups = PlayerGroupFilter(self.request.GET, self.get_object().groups.all(), prefix="groups")
+        groups = PlayerGroupFilter(self.request.GET, self.object.groups.all(), prefix="groups")
         games = GameFilter(self.request.GET, Game.objects.filter(groups__in=groups.qs), prefix="games")
         self.filters = groups, games
         return groups.qs, games.qs
@@ -367,8 +367,8 @@ class PlayerGroupDetailView(LoginRequiredMixin, PermissionRequiredMixin, MultiTa
     tables = PlayerTable, GameTable
 
     def get_tables_data(self):
-        users = PlayerFilter(self.request.GET, self.get_object().user_set.all(), prefix="player")
-        games = GameFilter(self.request.GET, self.get_object().games.all(), prefix="games")
+        users = PlayerFilter(self.request.GET, self.object.user_set.all(), prefix="player")
+        games = GameFilter(self.request.GET, self.object.games.all(), prefix="games")
         self.filters = users, games
         return users.qs, games.qs
 
@@ -425,7 +425,7 @@ class UserSubmissionDetailView(LoginRequiredMixin, SingleTableMixin, DetailView)
     template_name = "misterx/user_submission_detail.html"
 
     def get_table_data(self):
-        obj = self.get_object()
+        obj = self.object
         own_submissions = Submission.objects.filter(game=obj.game, task=obj.task, group=obj.group).exclude(pk=obj.pk)
         own_submissions_filter = UserSubmissionFilter(self.request.GET, own_submissions, prefix="own")
         self.filter = own_submissions_filter

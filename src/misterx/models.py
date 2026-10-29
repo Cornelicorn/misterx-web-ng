@@ -44,16 +44,10 @@ class Task(models.Model):
         return reverse("misterx:task-detail", kwargs={"pk": self.id})
 
     def has_been_completed(self, game: "Game") -> bool:
-        if game.submissions.filter(task=self, accepted=True).count():
-            return True
-        else:
-            return False
+        return game.submissions.filter(task=self, accepted=True).exists()
 
     def completed_by_group(self, game: "Game", group: PlayerGroup) -> bool:
-        if game.submissions.filter(task=self, accepted=True, group=group).count():
-            return True
-        else:
-            return False
+        return game.submissions.filter(task=self, accepted=True, group=group).exists()
 
 
 class OrderedTask(models.Model):
@@ -130,17 +124,19 @@ class Submission(models.Model):
 
     @property
     def granted_points(self) -> int:
+        if not self.accepted:
+            return 0
+        elif self.points_override is not None:
+            return self.points_override
+
+        # Only the first accepted submission of a group for a task is awarded points
         first_accepted = (
             Submission.objects.filter(game=self.game, task=self.task, group=self.group)
             .order_by("time")
             .filter(accepted=True)
             .first()
         )
-        if not self.accepted:
-            return 0
-        elif self.points_override is not None:
-            return self.points_override
-        elif first_accepted is not None and first_accepted.pk != self.pk:
+        if first_accepted is not None and first_accepted.pk != self.pk:
             return 0
         else:
             return self.task.points
