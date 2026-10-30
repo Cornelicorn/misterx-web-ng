@@ -4,7 +4,7 @@ from datetime import date
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
-from django.db import models
+from django.db import models, transaction
 from django.db.models import UniqueConstraint
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -77,7 +77,7 @@ class Game(models.Model):
         _("Active"),
         default=False,
         help_text=_(
-            "Whether this game is active. Only one game can be active at the same time, setting this will override the value of the currently active model"
+            "Whether this game is active. Only one game can be active at the same time, activating this game deactivates the currently active game"
         ),
     )
 
@@ -86,6 +86,16 @@ class Game(models.Model):
 
     def get_absolute_url(self):
         return reverse("misterx:game-detail", kwargs={"pk": self.id})
+
+    # Another active game doesn't make this game invalid, as it is deactivated when saving, see save()
+    def validate_constraints(self, exclude=None):
+        super().validate_constraints(exclude={*(exclude or ()), "active"})
+
+    def save(self, *args, **kwargs):
+        with transaction.atomic():
+            if self.active:
+                Game.objects.filter(active=True).exclude(pk=self.pk).update(active=False)
+            super().save(*args, **kwargs)
 
     class Meta:
         ordering = ["-date"]
