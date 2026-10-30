@@ -29,12 +29,16 @@
                     <div class="datagrid-content">{{ object.group }}</div>
                 </div>
                 <div class="datagrid-item">
+                    <div class="datagrid-title">{% trans "Game" %}</div>
+                    <div class="datagrid-content">{{ object.game }}</div>
+                </div>
+                <div class="datagrid-item">
                     <div class="datagrid-title">{% trans "Task" %}</div>
                     <div class="datagrid-content">{{ object.task }}</div>
                 </div>
                 <div class="datagrid-item">
-                    <div class="datagrid-title">{% trans "Game" %}</div>
-                    <div class="datagrid-content">{{ object.game }}</div>
+                    <div class="datagrid-title">{% trans "Submitter" %}</div>
+                    <div class="datagrid-content">{{ object.submitter | default:"—" }}</div>
                 </div>
                 <div class="datagrid-item">
                     <div class="datagrid-title">{% trans "Time" %}</div>

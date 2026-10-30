@@ -13,6 +13,9 @@
 
 {% block specific_content %}
     <div class="card mb-4">
+        <div class="card-header">
+            <h2 class="card-title">{% trans "Submission information" %}</h2>
+        </div>
         <div class="card-body">
             <div class="datagrid">
                 <div class="datagrid-item">
@@ -24,13 +27,24 @@
                     <div class="datagrid-content">{{ object.task }}</div>
                 </div>
                 <div class="datagrid-item">
-                    <div class="datagrid-title">{% trans "Submission Time" %}</div>
-                    <div class="datagrid-content">{% blocktrans with time=object.time|timesince %}{{ time }} ago{% endblocktrans %}</div>
+                    <div class="datagrid-title">{% trans "Submitter" %}</div>
+                    <div class="datagrid-content">{{ object.submitter | default:"—" }}</div>
+                </div>
+                <div class="datagrid-item">
+                    <div class="datagrid-title">{% trans "Time" %}</div>
+                    <div class="datagrid-content" title="{{ object.time }}">
+                        {% blocktrans with time=object.time|timesince %}{{ time }} ago{% endblocktrans %}
+                    </div>
                 </div>
             </div>
-            <hr />
-            {% crispy form form.helper %}
         </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h2 class="card-title">{% trans "Decision" %}</h2>
+        </div>
+        <div class="card-body">{% crispy form form.helper %}</div>
     </div>
 
     {% include "misterx/includes/submission_content.html" %}

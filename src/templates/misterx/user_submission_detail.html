@@ -25,6 +25,10 @@
                     <div class="datagrid-content">{{ object.task }}</div>
                 </div>
                 <div class="datagrid-item">
+                    <div class="datagrid-title">{% trans "Submitter" %}</div>
+                    <div class="datagrid-content">{{ object.submitter | default:"—" }}</div>
+                </div>
+                <div class="datagrid-item">
                     <div class="datagrid-title">{% trans "Time" %}</div>
                     <div class="datagrid-content">{{ object.time }}</div>
                 </div>
