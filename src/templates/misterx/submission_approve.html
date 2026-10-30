@@ -51,7 +51,7 @@
 
     {% trans "This group has only submitted this task once." as empty_title %}
     {% trans "If you didn't accept it, wait for the group to submit it again." as empty_subtitle %}
-    {% trans "Other Submissions by this group" as table_heading %}
+    {% trans "Other submissions by this group" as table_heading %}
     {% include "tables/table_card.html" with table=tables.0 filter=filters.0 id_filter_modal="id_filter_own" %}
 
     {% trans "Other groups haven't submitted this task yet." as empty_title %}

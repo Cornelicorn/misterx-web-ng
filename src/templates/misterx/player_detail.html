@@ -44,9 +44,9 @@
         </div>
     </div>
 
-    {% trans "No Groups assigned to the player yet." as empty_title %}
-    {% trans "Assign Groups by editing this player." as empty_subtitle %}
-    {% trans "Groups" as table_heading %}
+    {% trans "No playergroups assigned to the player yet." as empty_title %}
+    {% trans "Assign playergroups by editing this player." as empty_subtitle %}
+    {% trans "Playergroups" as table_heading %}
     {% include "tables/table_card.html" with table=tables.0 filter=filters.0 id_filter_modal="id_filter_groups" %}
 
     {% trans "This player doesn't participate in any games." as empty_title %}
