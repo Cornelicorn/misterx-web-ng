@@ -32,6 +32,14 @@ class TaskSelectWidget(forms.SelectMultiple):
         return context
 
 
+class AcceptedSelect(forms.NullBooleanSelect):
+    """Calls submissions which haven't been accepted or denied yet "Unreviewed" instead of "Unknown" """
+
+    def __init__(self, attrs=None):
+        super().__init__(attrs)
+        self.choices = [("unknown", _("Unreviewed")), ("true", _("Yes")), ("false", _("No"))]
+
+
 class MultipleFileInput(forms.ClearableFileInput):
     allow_multiple_selected = True
 
@@ -160,6 +168,7 @@ class SubmissionForm(forms.ModelForm):
             "explanation",
             "feedback",
         ]
+        widgets = {"accepted": AcceptedSelect}
 
 
 class SubmissionApproveForm(SubmissionForm):

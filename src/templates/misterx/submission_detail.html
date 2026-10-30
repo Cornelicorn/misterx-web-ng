@@ -46,7 +46,7 @@
                 </div>
                 <div class="datagrid-item">
                     <div class="datagrid-title">{% trans "Accepted" %}</div>
-                    <div class="datagrid-content">{{ object.accepted | yesno:_("Yes,No,Not yet reviewed") }}</div>
+                    <div class="datagrid-content">{{ object.accepted | yesno:_("Yes,No,Unreviewed") }}</div>
                 </div>
                 <div class="datagrid-item">
                     <div class="datagrid-title">{% trans "Points overridden" %}</div>
