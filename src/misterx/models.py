@@ -149,11 +149,12 @@ class Submission(models.Model):
 
     def clean(self):
         error_dict = {}
-        if self.task not in self.game.tasks.all():
+        # Missing game, task or group are already reported by the field validation
+        if self.game_id is not None and self.task_id is not None and self.task not in self.game.tasks.all():
             error_dict["task"] = _("The selected task is not chosen in the selected game")
-        if self.group not in self.game.groups.all():
+        if self.game_id is not None and self.group_id is not None and self.group not in self.game.groups.all():
             error_dict["group"] = _("The selected group is not playing in the selected game")
-        if self.submitter and self.group not in self.submitter.groups.all():
+        if self.submitter and self.group_id is not None and self.group not in self.submitter.groups.all():
             error_dict["submitter"] = _("The selected submitter is not part of the selected group")
         if error_dict:
             raise ValidationError(error_dict)
