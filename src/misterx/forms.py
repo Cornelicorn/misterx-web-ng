@@ -245,6 +245,7 @@ class PlayerForm(forms.ModelForm):
             "is_active",
             "groups",
         ]
+        labels = {"groups": _("Playergroups")}
 
     def clean_groups(self):
         data = self.cleaned_data["groups"]
