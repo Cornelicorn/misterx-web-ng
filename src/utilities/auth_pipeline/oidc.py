@@ -1,17 +1,13 @@
 from django.conf import settings
-from django.contrib.auth.models import Group
 
 
-def assign_groups_and_attributes(backend, user, response, *args, **kwargs):
+def assign_attributes(backend, user, response, *args, **kwargs):
     """
-    Assign Django groups based on OIDC claims.
+    Grant admin rights based on the OIDC groups claim. The groups themselves aren't synced, as all Django groups
+    are playergroups.
     """
     if backend.name == "oidc":
         groups = response.get("groups", [])
-
-        for group_name in groups:
-            group, _ = Group.objects.get_or_create(name=group_name)
-            user.groups.add(group)
 
         if settings.ADMIN_GROUP is not None:
             if settings.ADMIN_GROUP in groups:
