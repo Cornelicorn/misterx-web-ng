@@ -30,7 +30,7 @@
                 </div>
                 <div class="datagrid-item">
                     <div class="datagrid-title">{% trans "Players" %}</div>
-                    <div class="datagrid-content">{{ object.user_set.all | join:", " }}</div>
+                    <div class="datagrid-content">{{ object.user_set.all | join:", " | default:"—" }}</div>
                 </div>
             </div>
         </div>

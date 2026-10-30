@@ -34,7 +34,7 @@
                 </div>
                 <div class="datagrid-item">
                     <div class="datagrid-title">{% trans "Solution" %}</div>
-                    <div class="datagrid-content">{{ object.solution }}</div>
+                    <div class="datagrid-content">{{ object.solution | default:"—" }}</div>
                 </div>
             </div>
         </div>

@@ -30,11 +30,11 @@
                 </div>
                 <div class="datagrid-item">
                     <div class="datagrid-title">{% trans "First Name" %}</div>
-                    <div class="datagrid-content">{{ object.first_name }}</div>
+                    <div class="datagrid-content">{{ object.first_name | default:"—" }}</div>
                 </div>
                 <div class="datagrid-item">
                     <div class="datagrid-title">{% trans "Last Name" %}</div>
-                    <div class="datagrid-content">{{ object.last_name }}</div>
+                    <div class="datagrid-content">{{ object.last_name | default:"—" }}</div>
                 </div>
                 <div class="datagrid-item">
                     <div class="datagrid-title">{% trans "Active" %}</div>
