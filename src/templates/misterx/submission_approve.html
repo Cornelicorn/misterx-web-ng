@@ -11,6 +11,10 @@
     {% trans "Review" %}
 {% endblock page-pretitle %}
 
+{% block alerts %}
+    {% include "misterx/includes/multiple_groups_warning.html" %}
+{% endblock alerts %}
+
 {% block specific_content %}
     <div class="card mb-4">
         <div class="card-header">
