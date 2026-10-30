@@ -1,0 +1,176 @@
+[
+    {
+        "model": "misterx.game",
+        "pk": 1,
+        "fields": {
+            "name": "Mister X Spring 2026",
+            "date": "2026-04-18",
+            "active": false,
+            "groups": [["Red Team"], ["Blue Team"], ["Yellow Team"]]
+        }
+    },
+    {
+        "model": "misterx.game",
+        "pk": 2,
+        "fields": {
+            "name": "Mister X Autumn 2026",
+            "date": "2026-10-24",
+            "active": true,
+            "groups": [["Red Team"], ["Blue Team"], ["Green Team"]]
+        }
+    },
+    {
+        "model": "misterx.game",
+        "pk": 3,
+        "fields": {
+            "name": "Mister X Winter 2026",
+            "date": "2026-12-12",
+            "active": false,
+            "groups": []
+        }
+    },
+    {
+        "model": "misterx.orderedtask",
+        "pk": 1,
+        "fields": {
+            "game": 1,
+            "task": 1,
+            "task_number": 1
+        }
+    },
+    {
+        "model": "misterx.orderedtask",
+        "pk": 2,
+        "fields": {
+            "game": 1,
+            "task": 2,
+            "task_number": 2
+        }
+    },
+    {
+        "model": "misterx.orderedtask",
+        "pk": 3,
+        "fields": {
+            "game": 1,
+            "task": 3,
+            "task_number": 3
+        }
+    },
+    {
+        "model": "misterx.orderedtask",
+        "pk": 4,
+        "fields": {
+            "game": 1,
+            "task": 4,
+            "task_number": 4
+        }
+    },
+    {
+        "model": "misterx.orderedtask",
+        "pk": 5,
+        "fields": {
+            "game": 1,
+            "task": 6,
+            "task_number": 5
+        }
+    },
+    {
+        "model": "misterx.orderedtask",
+        "pk": 6,
+        "fields": {
+            "game": 2,
+            "task": 1,
+            "task_number": 1
+        }
+    },
+    {
+        "model": "misterx.orderedtask",
+        "pk": 7,
+        "fields": {
+            "game": 2,
+            "task": 4,
+            "task_number": 2
+        }
+    },
+    {
+        "model": "misterx.orderedtask",
+        "pk": 8,
+        "fields": {
+            "game": 2,
+            "task": 9,
+            "task_number": 3
+        }
+    },
+    {
+        "model": "misterx.orderedtask",
+        "pk": 9,
+        "fields": {
+            "game": 2,
+            "task": 5,
+            "task_number": 4
+        }
+    },
+    {
+        "model": "misterx.orderedtask",
+        "pk": 10,
+        "fields": {
+            "game": 2,
+            "task": 3,
+            "task_number": 5
+        }
+    },
+    {
+        "model": "misterx.orderedtask",
+        "pk": 11,
+        "fields": {
+            "game": 2,
+            "task": 8,
+            "task_number": 6
+        }
+    },
+    {
+        "model": "misterx.orderedtask",
+        "pk": 12,
+        "fields": {
+            "game": 2,
+            "task": 6,
+            "task_number": 7
+        }
+    },
+    {
+        "model": "misterx.orderedtask",
+        "pk": 13,
+        "fields": {
+            "game": 2,
+            "task": 7,
+            "task_number": 8
+        }
+    },
+    {
+        "model": "misterx.orderedtask",
+        "pk": 14,
+        "fields": {
+            "game": 3,
+            "task": 10,
+            "task_number": 1
+        }
+    },
+    {
+        "model": "misterx.orderedtask",
+        "pk": 15,
+        "fields": {
+            "game": 3,
+            "task": 1,
+            "task_number": 2
+        }
+    },
+    {
+        "model": "misterx.orderedtask",
+        "pk": 16,
+        "fields": {
+            "game": 3,
+            "task": 7,
+            "task_number": 3
+        }
+    }
+]

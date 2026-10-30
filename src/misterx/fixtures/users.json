@@ -1,0 +1,156 @@
+[
+    {
+        "model": "auth.group",
+        "fields": {
+            "name": "Red Team"
+        }
+    },
+    {
+        "model": "auth.group",
+        "fields": {
+            "name": "Blue Team"
+        }
+    },
+    {
+        "model": "auth.group",
+        "fields": {
+            "name": "Green Team"
+        }
+    },
+    {
+        "model": "auth.group",
+        "fields": {
+            "name": "Yellow Team"
+        }
+    },
+    {
+        "model": "auth.user",
+        "fields": {
+            "username": "admin",
+            "password": "pbkdf2_sha256$1500000$zbZ99FD6E3PkyQdjkZkbLK$JlYAw0TnZHkG7R7lAexS4SNyEUFUDjuqxNqY6gaeJLU=",
+            "first_name": "Ada",
+            "last_name": "Admin",
+            "is_staff": true,
+            "is_superuser": true,
+            "is_active": true,
+            "groups": []
+        }
+    },
+    {
+        "model": "auth.user",
+        "fields": {
+            "username": "reviewer",
+            "password": "pbkdf2_sha256$1500000$yWXUFjxyT8490D3ZJCpCoD$1EYYJObMz0sRqqDMxmlu7rkrhyssyAMi76H4o9iDtrw=",
+            "first_name": "Rita",
+            "last_name": "Reviewer",
+            "is_staff": true,
+            "is_superuser": true,
+            "is_active": true,
+            "groups": []
+        }
+    },
+    {
+        "model": "auth.user",
+        "fields": {
+            "username": "alice",
+            "password": "pbkdf2_sha256$1500000$xR7CyvHZHGS44n5RcHJKyJ$wVH691su7yUD3iU3Q2leZOnJvLWrxNfPqq9wmETZ2Mo=",
+            "first_name": "Alice",
+            "last_name": "Anderson",
+            "is_staff": false,
+            "is_superuser": false,
+            "is_active": true,
+            "groups": [["Red Team"]]
+        }
+    },
+    {
+        "model": "auth.user",
+        "fields": {
+            "username": "bob",
+            "password": "pbkdf2_sha256$1500000$Gfo1lN41I8faON2YX1Z2p4$2PbzSdUfP7M0T+7chx5zVd/ajyMSe+HzMzUxLGxq6TA=",
+            "first_name": "Bob",
+            "last_name": "Becker",
+            "is_staff": false,
+            "is_superuser": false,
+            "is_active": true,
+            "groups": [["Red Team"]]
+        }
+    },
+    {
+        "model": "auth.user",
+        "fields": {
+            "username": "carol",
+            "password": "pbkdf2_sha256$1500000$nLhYEx5QruyfAB0Dhu3YRc$5tObB5GzcmS3ypJQaz5dwMLkEkrozPosq6YJiWPH3X4=",
+            "first_name": "Carol",
+            "last_name": "Clarke",
+            "is_staff": false,
+            "is_superuser": false,
+            "is_active": true,
+            "groups": [["Blue Team"]]
+        }
+    },
+    {
+        "model": "auth.user",
+        "fields": {
+            "username": "dave",
+            "password": "pbkdf2_sha256$1500000$seyZimdSilXdBULdxT2LlU$yv+jav62ZiG4oyixylOOGhBMUkL4D0+mXcT0IZsbNIo=",
+            "first_name": "Dave",
+            "last_name": "Dietrich",
+            "is_staff": false,
+            "is_superuser": false,
+            "is_active": true,
+            "groups": [["Blue Team"]]
+        }
+    },
+    {
+        "model": "auth.user",
+        "fields": {
+            "username": "erin",
+            "password": "pbkdf2_sha256$1500000$Y7y3IpgB4TW6dVZ3sc2huL$257ooLMqoXLMhuhpSH1UXIJmesZlPmgPMUVxywEGFGk=",
+            "first_name": "Erin",
+            "last_name": "Engel",
+            "is_staff": false,
+            "is_superuser": false,
+            "is_active": true,
+            "groups": [["Green Team"]]
+        }
+    },
+    {
+        "model": "auth.user",
+        "fields": {
+            "username": "frank",
+            "password": "pbkdf2_sha256$1500000$aB3CfRwYdx6Sm5EcxpLOpk$Pea50cFSq0YOnwWPNDf8Uh/0QVaJo2f2iGXJctQ7hsg=",
+            "first_name": "Frank",
+            "last_name": "Fischer",
+            "is_staff": false,
+            "is_superuser": false,
+            "is_active": true,
+            "groups": [["Green Team"], ["Yellow Team"]]
+        }
+    },
+    {
+        "model": "auth.user",
+        "fields": {
+            "username": "grace",
+            "password": "pbkdf2_sha256$1500000$QBGKAeqBWpblSimVqpDd6g$iDwJlJjFLcyIjZwGI+u8pce6FNWcUP/YuflFUXlRV9M=",
+            "first_name": "Grace",
+            "last_name": "Graf",
+            "is_staff": false,
+            "is_superuser": false,
+            "is_active": true,
+            "groups": [["Yellow Team"]]
+        }
+    },
+    {
+        "model": "auth.user",
+        "fields": {
+            "username": "heidi",
+            "password": "pbkdf2_sha256$1500000$xLRD9C4oVLBJgd0Mlxpux2$1obH0ZHmvAGCI8h0XBPdmKzOY7RO5y1EXgc0/xkXG8Y=",
+            "first_name": "Heidi",
+            "last_name": "Hartmann",
+            "is_staff": false,
+            "is_superuser": false,
+            "is_active": false,
+            "groups": [["Yellow Team"]]
+        }
+    }
+]
