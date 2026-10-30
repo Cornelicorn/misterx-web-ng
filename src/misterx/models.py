@@ -1,4 +1,5 @@
 import uuid
+from collections import defaultdict
 from datetime import date
 
 from django.contrib.auth import get_user_model
@@ -107,6 +108,29 @@ class Game(models.Model):
                 violation_error_message=_("There is an active game already."),
             )
         ]
+
+
+def get_players_in_multiple_groups(games: models.QuerySet[Game]) -> dict[Game, dict[Player, list[Group]]]:
+    """
+    Finds the players who are in more than one group of one of the given games, which can happen when groups are
+    changed in the admin. Returns their groups by player by game.
+    """
+    groups_of_players = defaultdict(set)
+    for game_id, group_id, user_id in games.values_list("pk", "groups", "groups__user"):
+        if user_id is not None:
+            groups_of_players[game_id, user_id].add(group_id)
+    conflicts = {key: group_ids for key, group_ids in groups_of_players.items() if len(group_ids) > 1}
+    if not conflicts:
+        return {}
+
+    games_by_id = Game.objects.in_bulk({game_id for game_id, _user_id in conflicts})
+    players_by_id = Player.objects.in_bulk({user_id for _game_id, user_id in conflicts})
+    groups_by_id = PlayerGroup.objects.in_bulk(set().union(*conflicts.values()))
+    result: dict[Game, dict[Player, list[Group]]] = {}
+    for (game_id, user_id), group_ids in sorted(conflicts.items()):
+        groups = sorted((groups_by_id[group_id] for group_id in group_ids), key=str)
+        result.setdefault(games_by_id[game_id], {})[players_by_id[user_id]] = groups
+    return result
 
 
 class Submission(models.Model):

@@ -31,7 +31,7 @@ from .forms import (
     TaskForm,
     UserSubmissionForm,
 )
-from .models import Game, OrderedTask, Player, PlayerGroup, Submission, Task, Upload
+from .models import Game, OrderedTask, Player, PlayerGroup, Submission, Task, Upload, get_players_in_multiple_groups
 from .tables import (
     GamePlayerGroupTable,
     GameTable,
@@ -57,26 +57,53 @@ class SubmissionAlreadyReviewed(Exception):
     pass
 
 
+class PlayerInMultipleGroupsError(Exception):
+    def __init__(self, game, groups):
+        super().__init__()
+        self.game = game
+        self.groups = groups
+
+
 class PlayerGameMixin:
     """
-    Provides the active game and group of the requesting player and shows a
-    notice instead of the view if the player doesn't participate in a game
+    Provides the active game and group of the requesting player and shows a notice instead of the view if the
+    player doesn't participate in a game or is in more than one group of it
     """
 
+    def get_group(self, game):
+        groups = list(game.groups.filter(user=self.request.user))
+        if len(groups) > 1:
+            raise PlayerInMultipleGroupsError(game, groups)
+        return groups[0] if groups else None
+
     def get_game_and_group(self):
-        groups = self.request.user.groups.all()
-        try:
-            game = Game.objects.filter(groups__in=groups).get(active=True)
-        except ObjectDoesNotExist:
+        game = Game.objects.filter(active=True, groups__user=self.request.user).first()
+        if game is None:
             raise NoActiveGameError()
-        group = game.groups.intersection(groups).first()
-        return game, group
+        return game, self.get_group(game)
 
     def dispatch(self, request, *args, **kwargs):
         try:
             return super().dispatch(request, *args, **kwargs)
         except NoActiveGameError:
             return render(request, "misterx/no_active_game.html")
+        except PlayerInMultipleGroupsError as e:
+            return render(request, "misterx/player_in_multiple_groups.html", {"game": e.game, "groups": e.groups})
+
+
+class MultipleGroupsWarningMixin:
+    """
+    Warns about players who are in more than one group of the games of get_games_to_check(), as they can't see
+    anything of these games until they are in only one of their groups
+    """
+
+    def get_games_to_check(self):
+        return Game.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["players_in_multiple_groups"] = get_players_in_multiple_groups(self.get_games_to_check())
+        return context
 
 
 class FilteredMultiTableMixin(MultiTableMixin):
@@ -119,7 +146,7 @@ class RelatedSubmissionsMixin(FilteredMultiTableMixin):
         return own_submissions_filter.qs, other_submissions_filter.qs
 
 
-class GameListView(LoginRequiredMixin, PermissionRequiredMixin, SingleTableMixin, FilterView):
+class GameListView(LoginRequiredMixin, PermissionRequiredMixin, MultipleGroupsWarningMixin, SingleTableMixin, FilterView):
     model = Game
     permission_required = "misterx.view_game"
     permission_object = None
@@ -143,10 +170,15 @@ class GameEditView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     form_class = GameForm
 
 
-class GameDetailView(LoginRequiredMixin, PermissionRequiredMixin, FilteredMultiTableMixin, DetailView):
+class GameDetailView(
+    LoginRequiredMixin, PermissionRequiredMixin, MultipleGroupsWarningMixin, FilteredMultiTableMixin, DetailView
+):
     model = Game
     permission_required = "misterx.view_game"
     tables = GamePlayerGroupTable, OrderedTaskTable, SubmissionTable
+
+    def get_games_to_check(self):
+        return Game.objects.filter(pk=self.object.pk)
 
     def get_tables_data(self):
         game = self.object
@@ -215,7 +247,7 @@ class TaskDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     template_name = "generic/object_confirm_delete.html"
 
 
-class SubmissionListView(LoginRequiredMixin, PermissionRequiredMixin, SingleTableMixin, FilterView):
+class SubmissionListView(LoginRequiredMixin, PermissionRequiredMixin, MultipleGroupsWarningMixin, SingleTableMixin, FilterView):
     model = Submission
     permission_required = "misterx.view_submission"
     permission_object = None
@@ -254,17 +286,28 @@ class SubmissionEditView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView
     form_class = SubmissionForm
 
 
-class SubmissionDetailView(LoginRequiredMixin, PermissionRequiredMixin, RelatedSubmissionsMixin, DetailView):
+class SubmissionDetailView(
+    LoginRequiredMixin, PermissionRequiredMixin, MultipleGroupsWarningMixin, RelatedSubmissionsMixin, DetailView
+):
     model = Submission
     permission_required = "misterx.view_submission"
 
+    def get_games_to_check(self):
+        return Game.objects.filter(pk=self.object.game_id)
 
-class SubmissionApproveView(LoginRequiredMixin, PermissionRequiredMixin, RelatedSubmissionsMixin, UpdateView):
+
+class SubmissionApproveView(
+    LoginRequiredMixin, PermissionRequiredMixin, MultipleGroupsWarningMixin, RelatedSubmissionsMixin, UpdateView
+):
     model = Submission
     form_class = SubmissionApproveForm
     permission_required = "misterx.change_submission"
     permission_object = None
     template_name = "misterx/submission_approve.html"
+
+    # Only submissions of the active game are reviewed
+    def get_games_to_check(self):
+        return Game.objects.filter(active=True)
 
     def get_object(self, queryset=None):
         try:
@@ -298,7 +341,9 @@ class SubmissionApproveView(LoginRequiredMixin, PermissionRequiredMixin, Related
         except NoActiveGameError:
             return render(request, "misterx/no_active_game.html", {"for_staff": True})
         except NoUnreviewedSubmissions:
-            return render(request, "misterx/no_unreviewed_submissions.html")
+            # Players in more than one group can't submit anything, so they might be why there is nothing to review
+            players = get_players_in_multiple_groups(self.get_games_to_check())
+            return render(request, "misterx/no_unreviewed_submissions.html", {"players_in_multiple_groups": players})
         except SubmissionAlreadyReviewed:
             return render(request, "misterx/submission_already_reviewed.html")
 
@@ -451,7 +496,7 @@ class UserSubmissionListView(LoginRequiredMixin, PlayerGameMixin, SingleTableMix
         return qs
 
 
-class UserSubmissionDetailView(LoginRequiredMixin, SingleTableMixin, DetailView):
+class UserSubmissionDetailView(LoginRequiredMixin, PlayerGameMixin, SingleTableMixin, DetailView):
     model = Submission
     table_class = UserSubmissionTable
     template_name = "misterx/user_submission_detail.html"
@@ -478,6 +523,8 @@ class UserSubmissionDetailView(LoginRequiredMixin, SingleTableMixin, DetailView)
         obj = super().get_object(queryset)
         if not self.request.user.groups.filter(pk=obj.group_id).exists():
             raise PermissionDenied("You are not in the group of this Submission")
+        # Players in more than one group of the game must not see anything of it
+        self.get_group(obj.game)
         return obj
 
 

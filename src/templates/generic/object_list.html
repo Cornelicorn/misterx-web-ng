@@ -38,6 +38,9 @@
         <hr>
         <main class="page-body">
 
+            {% block alerts %}
+            {% endblock alerts %}
+
             {% block table %}
                 {% include "tables/table_card.html" %}
             {% endblock table %}
