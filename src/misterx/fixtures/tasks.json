@@ -1,0 +1,101 @@
+[
+    {
+        "model": "misterx.task",
+        "pk": 1,
+        "fields": {
+            "task": "Take a photo of your whole group in front of the main station.",
+            "points": 10,
+            "solution": null
+        }
+    },
+    {
+        "model": "misterx.task",
+        "pk": 2,
+        "fields": {
+            "task": "How many steps lead up to the viewing platform of the church tower?",
+            "points": 15,
+            "solution": "212 steps"
+        }
+    },
+    {
+        "model": "misterx.task",
+        "pk": 3,
+        "fields": {
+            "task": "Record a video of your group singing a song on a bus.",
+            "points": 20,
+            "solution": null
+        }
+    },
+    {
+        "model": "misterx.task",
+        "pk": 4,
+        "fields": {
+            "task": "Find a street that is named after a scientist and photograph its street sign.",
+            "points": 10,
+            "solution": "For example Einsteinstraße, Curiestraße or Humboldtallee"
+        }
+    },
+    {
+        "model": "misterx.task",
+        "pk": 5,
+        "fields": {
+            "task": "Take a photo at the final stop of three different tram lines.",
+            "points": 30,
+            "solution": null
+        }
+    },
+    {
+        "model": "misterx.task",
+        "pk": 6,
+        "fields": {
+            "task": "Find the oldest tree in the city park and photograph the plaque next to it.",
+            "points": 15,
+            "solution": "The oak near the north entrance, planted in 1822"
+        }
+    },
+    {
+        "model": "misterx.task",
+        "pk": 7,
+        "fields": {
+            "task": "Take a photo of Mister X without being noticed.",
+            "points": 50,
+            "solution": null
+        }
+    },
+    {
+        "model": "misterx.task",
+        "pk": 8,
+        "fields": {
+            "task": "Take a photo of a dog together with your whole group.",
+            "points": 5,
+            "solution": null
+        }
+    },
+    {
+        "model": "misterx.task",
+        "pk": 9,
+        "fields": {
+            "task": "I have keys but open no locks. Solve the riddle and take a photo of the answer.",
+            "points": 20,
+            "solution": "A piano"
+        }
+    },
+    {
+        "model": "misterx.task",
+        "pk": 10,
+        "fields": {
+            "task": "Get a stranger to write \"Mister X was here\" on a piece of paper and photograph it.",
+            "points": 10,
+            "solution": null
+        }
+    },
+    {
+        "model": "misterx.task",
+        "pk": 11,
+        "fields": {
+            "task": "Build a human pyramid with all members of your group.",
+            "points": 25,
+            "solution": null
+        }
+    }
+]

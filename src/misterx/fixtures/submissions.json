@@ -1,0 +1,347 @@
+[
+    {
+        "model": "misterx.submission",
+        "pk": 1,
+        "fields": {
+            "game": 1,
+            "group": ["Red Team"],
+            "task": 1,
+            "submitter": ["alice"],
+            "time": "2026-04-18T10:12:00Z",
+            "accepted": true,
+            "points_override": null,
+            "explanation": null,
+            "feedback": null
+        }
+    },
+    {
+        "model": "misterx.submission",
+        "pk": 2,
+        "fields": {
+            "game": 1,
+            "group": ["Blue Team"],
+            "task": 1,
+            "submitter": ["carol"],
+            "time": "2026-04-18T10:20:00Z",
+            "accepted": true,
+            "points_override": null,
+            "explanation": null,
+            "feedback": null
+        }
+    },
+    {
+        "model": "misterx.submission",
+        "pk": 3,
+        "fields": {
+            "game": 1,
+            "group": ["Yellow Team"],
+            "task": 1,
+            "submitter": ["grace"],
+            "time": "2026-04-18T10:31:00Z",
+            "accepted": true,
+            "points_override": null,
+            "explanation": null,
+            "feedback": null
+        }
+    },
+    {
+        "model": "misterx.submission",
+        "pk": 4,
+        "fields": {
+            "game": 1,
+            "group": ["Red Team"],
+            "task": 2,
+            "submitter": ["bob"],
+            "time": "2026-04-18T11:05:00Z",
+            "accepted": true,
+            "points_override": null,
+            "explanation": "212",
+            "feedback": null
+        }
+    },
+    {
+        "model": "misterx.submission",
+        "pk": 5,
+        "fields": {
+            "game": 1,
+            "group": ["Blue Team"],
+            "task": 2,
+            "submitter": ["dave"],
+            "time": "2026-04-18T11:40:00Z",
+            "accepted": false,
+            "points_override": null,
+            "explanation": "198",
+            "feedback": "That's not the right number, count again!"
+        }
+    },
+    {
+        "model": "misterx.submission",
+        "pk": 6,
+        "fields": {
+            "game": 1,
+            "group": ["Red Team"],
+            "task": 3,
+            "submitter": ["alice"],
+            "time": "2026-04-18T12:15:00Z",
+            "accepted": false,
+            "points_override": null,
+            "explanation": null,
+            "feedback": "We can't hear anyone singing in the video."
+        }
+    },
+    {
+        "model": "misterx.submission",
+        "pk": 7,
+        "fields": {
+            "game": 1,
+            "group": ["Red Team"],
+            "task": 3,
+            "submitter": ["bob"],
+            "time": "2026-04-18T12:48:00Z",
+            "accepted": true,
+            "points_override": null,
+            "explanation": "Now with sound!",
+            "feedback": null
+        }
+    },
+    {
+        "model": "misterx.submission",
+        "pk": 8,
+        "fields": {
+            "game": 1,
+            "group": ["Blue Team"],
+            "task": 4,
+            "submitter": ["carol"],
+            "time": "2026-04-18T13:22:00Z",
+            "accepted": true,
+            "points_override": 5,
+            "explanation": "Röntgenstraße",
+            "feedback": "Only half of the sign is in the photo, so you only get half of the points."
+        }
+    },
+    {
+        "model": "misterx.submission",
+        "pk": 9,
+        "fields": {
+            "game": 1,
+            "group": ["Yellow Team"],
+            "task": 6,
+            "submitter": ["frank"],
+            "time": "2026-04-18T14:03:00Z",
+            "accepted": true,
+            "points_override": null,
+            "explanation": null,
+            "feedback": null
+        }
+    },
+    {
+        "model": "misterx.submission",
+        "pk": 10,
+        "fields": {
+            "game": 1,
+            "group": ["Yellow Team"],
+            "task": 4,
+            "submitter": ["heidi"],
+            "time": "2026-04-18T14:30:00Z",
+            "accepted": true,
+            "points_override": null,
+            "explanation": "Kopernikusstraße",
+            "feedback": null
+        }
+    },
+    {
+        "model": "misterx.submission",
+        "pk": 11,
+        "fields": {
+            "game": 2,
+            "group": ["Red Team"],
+            "task": 1,
+            "submitter": ["alice"],
+            "time": "2026-10-24T10:05:00Z",
+            "accepted": true,
+            "points_override": null,
+            "explanation": null,
+            "feedback": null
+        }
+    },
+    {
+        "model": "misterx.submission",
+        "pk": 12,
+        "fields": {
+            "game": 2,
+            "group": ["Blue Team"],
+            "task": 1,
+            "submitter": ["carol"],
+            "time": "2026-10-24T10:09:00Z",
+            "accepted": true,
+            "points_override": null,
+            "explanation": null,
+            "feedback": null
+        }
+    },
+    {
+        "model": "misterx.submission",
+        "pk": 13,
+        "fields": {
+            "game": 2,
+            "group": ["Green Team"],
+            "task": 1,
+            "submitter": ["erin"],
+            "time": "2026-10-24T10:14:00Z",
+            "accepted": false,
+            "points_override": null,
+            "explanation": null,
+            "feedback": "Frank is missing in the photo."
+        }
+    },
+    {
+        "model": "misterx.submission",
+        "pk": 14,
+        "fields": {
+            "game": 2,
+            "group": ["Red Team"],
+            "task": 4,
+            "submitter": ["bob"],
+            "time": "2026-10-24T10:52:00Z",
+            "accepted": true,
+            "points_override": null,
+            "explanation": "Einsteinstraße",
+            "feedback": null
+        }
+    },
+    {
+        "model": "misterx.submission",
+        "pk": 15,
+        "fields": {
+            "game": 2,
+            "group": ["Red Team"],
+            "task": 4,
+            "submitter": ["alice"],
+            "time": "2026-10-24T11:03:00Z",
+            "accepted": true,
+            "points_override": null,
+            "explanation": "Curiestraße, in case the first one doesn't count",
+            "feedback": null
+        }
+    },
+    {
+        "model": "misterx.submission",
+        "pk": 16,
+        "fields": {
+            "game": 2,
+            "group": ["Blue Team"],
+            "task": 8,
+            "submitter": ["dave"],
+            "time": "2026-10-24T11:30:00Z",
+            "accepted": true,
+            "points_override": 10,
+            "explanation": "We found two dogs!",
+            "feedback": "Two dogs, double points."
+        }
+    },
+    {
+        "model": "misterx.submission",
+        "pk": 17,
+        "fields": {
+            "game": 2,
+            "group": ["Green Team"],
+            "task": 3,
+            "submitter": ["erin"],
+            "time": "2026-10-24T11:45:00Z",
+            "accepted": true,
+            "points_override": null,
+            "explanation": "Sang live in front of the game leaders.",
+            "feedback": null
+        }
+    },
+    {
+        "model": "misterx.submission",
+        "pk": 18,
+        "fields": {
+            "game": 2,
+            "group": ["Red Team"],
+            "task": 9,
+            "submitter": ["alice"],
+            "time": "2026-10-24T12:20:00Z",
+            "accepted": false,
+            "points_override": null,
+            "explanation": "A keyboard",
+            "feedback": "Close, but not quite. Think of an instrument."
+        }
+    },
+    {
+        "model": "misterx.submission",
+        "pk": 19,
+        "fields": {
+            "game": 2,
+            "group": ["Blue Team"],
+            "task": 5,
+            "submitter": ["dave"],
+            "time": "2026-10-24T13:10:00Z",
+            "accepted": null,
+            "points_override": null,
+            "explanation": "Lines 1, 4 and 7",
+            "feedback": null
+        }
+    },
+    {
+        "model": "misterx.submission",
+        "pk": 20,
+        "fields": {
+            "game": 2,
+            "group": ["Green Team"],
+            "task": 1,
+            "submitter": ["frank"],
+            "time": "2026-10-24T13:25:00Z",
+            "accepted": null,
+            "points_override": null,
+            "explanation": "Now with everyone in the photo.",
+            "feedback": null
+        }
+    },
+    {
+        "model": "misterx.submission",
+        "pk": 21,
+        "fields": {
+            "game": 2,
+            "group": ["Red Team"],
+            "task": 9,
+            "submitter": ["bob"],
+            "time": "2026-10-24T13:40:00Z",
+            "accepted": null,
+            "points_override": null,
+            "explanation": "A piano",
+            "feedback": null
+        }
+    },
+    {
+        "model": "misterx.submission",
+        "pk": 22,
+        "fields": {
+            "game": 2,
+            "group": ["Green Team"],
+            "task": 6,
+            "submitter": ["erin"],
+            "time": "2026-10-24T14:02:00Z",
+            "accepted": null,
+            "points_override": null,
+            "explanation": null,
+            "feedback": null
+        }
+    },
+    {
+        "model": "misterx.submission",
+        "pk": 23,
+        "fields": {
+            "game": 2,
+            "group": ["Red Team"],
+            "task": 7,
+            "submitter": ["alice"],
+            "time": "2026-10-24T14:15:00Z",
+            "accepted": null,
+            "points_override": null,
+            "explanation": "Mister X next to the fountain on the market square.",
+            "feedback": null
+        }
+    }
+]
