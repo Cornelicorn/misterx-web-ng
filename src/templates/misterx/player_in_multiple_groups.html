@@ -1,0 +1,14 @@
+{% extends "base/layout.html" %}
+
+{% load i18n %}
+
+{% block content %}
+    <main class="page-body">
+        <div class="empty">
+            <p class="empty-title">{% blocktrans %}You are in more than one playergroup of {{ game }}{% endblocktrans %}</p>
+            <p class="empty-subtitle text-secondary">
+                {% blocktrans with groups=groups|join:", " %}You are in the playergroups {{ groups }}. Please ask the game leaders to keep you in only one of them, until then you can't take part in the game.{% endblocktrans %}
+            </p>
+        </div>
+    </main>
+{% endblock content %}

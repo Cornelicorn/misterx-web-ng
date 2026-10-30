@@ -1,14 +1,14 @@
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.db import models, transaction
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import DeleteView, DetailView, UpdateView
 from django.views.static import serve
 from django_filters.views import FilterView
 from django_tables2 import MultiTableMixin, SingleTableMixin
-from guardian.mixins import LoginRequiredMixin, PermissionListMixin, PermissionRequiredMixin
+from guardian.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
 from utilities.views import InitialCreateView
 
@@ -31,7 +31,7 @@ from .forms import (
     TaskForm,
     UserSubmissionForm,
 )
-from .models import Game, OrderedTask, Player, PlayerGroup, Submission, Task, Upload
+from .models import Game, OrderedTask, Player, PlayerGroup, Submission, Task, Upload, get_players_in_multiple_groups
 from .tables import (
     GamePlayerGroupTable,
     GameTable,
@@ -57,31 +57,99 @@ class SubmissionAlreadyReviewed(Exception):
     pass
 
 
+class PlayerInMultipleGroupsError(Exception):
+    def __init__(self, game, groups):
+        super().__init__()
+        self.game = game
+        self.groups = groups
+
+
 class PlayerGameMixin:
     """
-    Provides the active game and group of the requesting player and shows a
-    notice instead of the view if the player doesn't participate in a game
+    Provides the active game and group of the requesting player and shows a notice instead of the view if the
+    player doesn't participate in a game or is in more than one group of it
     """
 
+    def get_group(self, game):
+        groups = list(game.groups.filter(user=self.request.user))
+        if len(groups) > 1:
+            raise PlayerInMultipleGroupsError(game, groups)
+        return groups[0] if groups else None
+
     def get_game_and_group(self):
-        groups = self.request.user.groups.all()
-        try:
-            game = Game.objects.filter(groups__in=groups).get(active=True)
-        except ObjectDoesNotExist:
+        game = Game.objects.filter(active=True, groups__user=self.request.user).first()
+        if game is None:
             raise NoActiveGameError()
-        group = game.groups.intersection(groups).first()
-        return game, group
+        return game, self.get_group(game)
 
     def dispatch(self, request, *args, **kwargs):
         try:
             return super().dispatch(request, *args, **kwargs)
         except NoActiveGameError:
             return render(request, "misterx/no_active_game.html")
+        except PlayerInMultipleGroupsError as e:
+            return render(request, "misterx/player_in_multiple_groups.html", {"game": e.game, "groups": e.groups})
 
 
-class GameListView(LoginRequiredMixin, PermissionListMixin, SingleTableMixin, FilterView):
+class MultipleGroupsWarningMixin:
+    """
+    Warns about players who are in more than one group of the games of get_games_to_check(), as they can't see
+    anything of these games until they are in only one of their groups
+    """
+
+    def get_games_to_check(self):
+        return Game.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["players_in_multiple_groups"] = get_players_in_multiple_groups(self.get_games_to_check())
+        return context
+
+
+class FilteredMultiTableMixin(MultiTableMixin):
+    """
+    Provides the filters of the tables to the template, get_tables_data() has to store them in self.filters.
+    The columns of fields left out of a filter with exclude are hidden as well, as they have the same value in
+    every row.
+    """
+
+    def get_tables(self):
+        tables = super().get_tables()
+        for table, filterset in zip(tables, self.filters):
+            table.exclude = (*table.exclude, *getattr(filterset, "excluded", ()))
+        return tables
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({"filters": self.filters})
+        return context
+
+
+class RelatedSubmissionsMixin(FilteredMultiTableMixin):
+    """
+    Lists the other submissions of the group and the submissions of the other groups for the task of the submission
+    """
+
+    tables = SubmissionTable, SubmissionTable
+
+    def get_tables_data(self):
+        obj = self.object
+        own_submissions = Submission.objects.filter(game=obj.game, task=obj.task, group=obj.group).exclude(pk=obj.pk)
+        other_submissions = Submission.objects.filter(game=obj.game, task=obj.task).exclude(group=obj.group)
+        own_submissions_filter = SubmissionFilter(
+            self.request.GET, own_submissions, prefix="own", exclude=["group", "game", "task"]
+        )
+        other_submissions_filter = SubmissionFilter(
+            self.request.GET, other_submissions, prefix="other", exclude=["game", "task"]
+        )
+        self.filters = own_submissions_filter, other_submissions_filter
+        return own_submissions_filter.qs, other_submissions_filter.qs
+
+
+class GameListView(LoginRequiredMixin, PermissionRequiredMixin, MultipleGroupsWarningMixin, SingleTableMixin, FilterView):
     model = Game
     permission_required = "misterx.view_game"
+    permission_object = None
     table_class = GameTable
     template_name = "misterx/game_list.html"
     filterset_class = GameFilter
@@ -102,10 +170,15 @@ class GameEditView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     form_class = GameForm
 
 
-class GameDetailView(LoginRequiredMixin, PermissionRequiredMixin, MultiTableMixin, DetailView):
+class GameDetailView(
+    LoginRequiredMixin, PermissionRequiredMixin, MultipleGroupsWarningMixin, FilteredMultiTableMixin, DetailView
+):
     model = Game
     permission_required = "misterx.view_game"
     tables = GamePlayerGroupTable, OrderedTaskTable, SubmissionTable
+
+    def get_games_to_check(self):
+        return Game.objects.filter(pk=self.object.pk)
 
     def get_tables_data(self):
         game = self.object
@@ -119,14 +192,9 @@ class GameDetailView(LoginRequiredMixin, PermissionRequiredMixin, MultiTableMixi
             ).order_by("task_number"),
             prefix="tasks",
         )
-        submissions = SubmissionFilter(self.request.GET, game.submissions.all(), prefix="submissions")
+        submissions = SubmissionFilter(self.request.GET, game.submissions.all(), prefix="submissions", exclude=["game"])
         self.filters = groups, tasks, submissions
         return groups.qs, tasks.qs, submissions.qs
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update({"filters": self.filters})
-        return context
 
 
 class GameDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
@@ -136,9 +204,10 @@ class GameDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     template_name = "generic/object_confirm_delete.html"
 
 
-class TaskListView(LoginRequiredMixin, PermissionListMixin, SingleTableMixin, FilterView):
+class TaskListView(LoginRequiredMixin, PermissionRequiredMixin, SingleTableMixin, FilterView):
     model = Task
     permission_required = "misterx.view_task"
+    permission_object = None
     table_class = TaskTable
     template_name = "misterx/task_list.html"
     filterset_class = TaskFilter
@@ -159,21 +228,16 @@ class TaskEditView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     form_class = TaskForm
 
 
-class TaskDetailView(LoginRequiredMixin, PermissionRequiredMixin, MultiTableMixin, DetailView):
+class TaskDetailView(LoginRequiredMixin, PermissionRequiredMixin, FilteredMultiTableMixin, DetailView):
     model = Task
     permission_required = "misterx.view_task"
     tables = GameTable, SubmissionTable
 
     def get_tables_data(self):
         games = GameFilter(self.request.GET, self.object.games.all(), prefix="games")
-        submissions = SubmissionFilter(self.request.GET, self.object.submissions.all(), prefix="submissions")
+        submissions = SubmissionFilter(self.request.GET, self.object.submissions.all(), prefix="submissions", exclude=["task"])
         self.filters = games, submissions
         return games.qs, submissions.qs
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update({"filters": self.filters})
-        return context
 
 
 class TaskDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
@@ -183,9 +247,10 @@ class TaskDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     template_name = "generic/object_confirm_delete.html"
 
 
-class SubmissionListView(LoginRequiredMixin, PermissionListMixin, SingleTableMixin, FilterView):
+class SubmissionListView(LoginRequiredMixin, PermissionRequiredMixin, MultipleGroupsWarningMixin, SingleTableMixin, FilterView):
     model = Submission
     permission_required = "misterx.view_submission"
+    permission_object = None
     table_class = SubmissionTable
     template_name = "misterx/submission_list.html"
     filterset_class = SubmissionFilter
@@ -202,6 +267,17 @@ class SubmissionCreateView(LoginRequiredMixin, PermissionRequiredMixin, InitialC
 class GameSubmissionCreateView(SubmissionCreateView):
     form_class = GameSubmissionForm
 
+    # The "Add Submission" button of a game passes the game and group in the query string
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        try:
+            game = Game.objects.get(pk=self.request.GET.get("game"))
+            group = game.groups.get(pk=self.request.GET.get("group"))
+        except (ObjectDoesNotExist, ValueError):
+            raise Http404()
+        kwargs["instance"] = Submission(game=game, group=group)
+        return kwargs
+
 
 class SubmissionEditView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = Submission
@@ -210,47 +286,28 @@ class SubmissionEditView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView
     form_class = SubmissionForm
 
 
-class SubmissionDetailView(LoginRequiredMixin, PermissionRequiredMixin, MultiTableMixin, DetailView):
+class SubmissionDetailView(
+    LoginRequiredMixin, PermissionRequiredMixin, MultipleGroupsWarningMixin, RelatedSubmissionsMixin, DetailView
+):
     model = Submission
     permission_required = "misterx.view_submission"
-    tables = SubmissionTable, SubmissionTable
 
-    def get_tables_data(self):
-        obj = self.object
-        own_submissions = Submission.objects.filter(game=obj.game, task=obj.task, group=obj.group).exclude(pk=obj.pk)
-        other_submissions = Submission.objects.filter(game=obj.game, task=obj.task).exclude(group=obj.group)
-        own_submissions_filter = SubmissionFilter(self.request.GET, own_submissions, prefix="own")
-        other_submissions_filter = SubmissionFilter(self.request.GET, other_submissions, prefix="other")
-        self.filters = own_submissions_filter, other_submissions_filter
-        return own_submissions_filter.qs, other_submissions_filter.qs
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update({"filters": self.filters})
-        return context
+    def get_games_to_check(self):
+        return Game.objects.filter(pk=self.object.game_id)
 
 
-class SubmissionApproveView(LoginRequiredMixin, PermissionRequiredMixin, MultiTableMixin, UpdateView):
+class SubmissionApproveView(
+    LoginRequiredMixin, PermissionRequiredMixin, MultipleGroupsWarningMixin, RelatedSubmissionsMixin, UpdateView
+):
     model = Submission
     form_class = SubmissionApproveForm
     permission_required = "misterx.change_submission"
     permission_object = None
     template_name = "misterx/submission_approve.html"
-    tables = SubmissionTable, SubmissionTable
 
-    def get_tables_data(self):
-        obj = self.object
-        own_submissions = Submission.objects.filter(game=obj.game, task=obj.task, group=obj.group).exclude(pk=obj.pk)
-        other_submissions = Submission.objects.filter(game=obj.game, task=obj.task).exclude(group=obj.group)
-        own_submissions_filter = SubmissionFilter(self.request.GET, own_submissions, prefix="own")
-        other_submissions_filter = SubmissionFilter(self.request.GET, other_submissions, prefix="other")
-        self.filters = own_submissions_filter, other_submissions_filter
-        return own_submissions_filter.qs, other_submissions_filter.qs
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update({"filters": self.filters})
-        return context
+    # Only submissions of the active game are reviewed
+    def get_games_to_check(self):
+        return Game.objects.filter(active=True)
 
     def get_object(self, queryset=None):
         try:
@@ -284,7 +341,9 @@ class SubmissionApproveView(LoginRequiredMixin, PermissionRequiredMixin, MultiTa
         except NoActiveGameError:
             return render(request, "misterx/no_active_game.html", {"for_staff": True})
         except NoUnreviewedSubmissions:
-            return render(request, "misterx/no_unreviewed_submissions.html")
+            # Players in more than one group can't submit anything, so they might be why there is nothing to review
+            players = get_players_in_multiple_groups(self.get_games_to_check())
+            return render(request, "misterx/no_unreviewed_submissions.html", {"players_in_multiple_groups": players})
         except SubmissionAlreadyReviewed:
             return render(request, "misterx/submission_already_reviewed.html")
 
@@ -316,9 +375,10 @@ class SubmissionDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteVi
     template_name = "generic/object_confirm_delete.html"
 
 
-class PlayerListView(LoginRequiredMixin, PermissionListMixin, SingleTableMixin, FilterView):
+class PlayerListView(LoginRequiredMixin, PermissionRequiredMixin, SingleTableMixin, FilterView):
     model = Player
     permission_required = "auth.view_user"
+    permission_object = None
     table_class = PlayerTable
     template_name = "misterx/player_list.html"
     filterset_class = PlayerFilter
@@ -339,7 +399,7 @@ class PlayerEditView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     form_class = PlayerForm
 
 
-class PlayerDetailView(LoginRequiredMixin, PermissionRequiredMixin, MultiTableMixin, DetailView):
+class PlayerDetailView(LoginRequiredMixin, PermissionRequiredMixin, FilteredMultiTableMixin, DetailView):
     model = Player
     permission_required = "auth.view_user"
     tables = PlayerGroupTable, GameTable
@@ -350,11 +410,6 @@ class PlayerDetailView(LoginRequiredMixin, PermissionRequiredMixin, MultiTableMi
         self.filters = groups, games
         return groups.qs, games.qs
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update({"filters": self.filters})
-        return context
-
 
 class PlayerDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     model = Player
@@ -363,9 +418,10 @@ class PlayerDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     template_name = "generic/object_confirm_delete.html"
 
 
-class PlayerGroupListView(LoginRequiredMixin, PermissionListMixin, SingleTableMixin, FilterView):
+class PlayerGroupListView(LoginRequiredMixin, PermissionRequiredMixin, SingleTableMixin, FilterView):
     model = PlayerGroup
     permission_required = "auth.view_group"
+    permission_object = None
     table_class = PlayerGroupTable
     template_name = "misterx/playergroup_list.html"
     filterset_class = PlayerGroupFilter
@@ -386,7 +442,7 @@ class PlayerGroupEditView(LoginRequiredMixin, PermissionRequiredMixin, UpdateVie
     form_class = PlayerGroupForm
 
 
-class PlayerGroupDetailView(LoginRequiredMixin, PermissionRequiredMixin, MultiTableMixin, DetailView):
+class PlayerGroupDetailView(LoginRequiredMixin, PermissionRequiredMixin, FilteredMultiTableMixin, DetailView):
     model = PlayerGroup
     permission_required = "auth.view_group"
     tables = PlayerTable, GameTable
@@ -396,11 +452,6 @@ class PlayerGroupDetailView(LoginRequiredMixin, PermissionRequiredMixin, MultiTa
         games = GameFilter(self.request.GET, self.object.games.all(), prefix="games")
         self.filters = users, games
         return users.qs, games.qs
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update({"filters": self.filters})
-        return context
 
 
 class PlayerGroupDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
@@ -445,7 +496,7 @@ class UserSubmissionListView(LoginRequiredMixin, PlayerGameMixin, SingleTableMix
         return qs
 
 
-class UserSubmissionDetailView(LoginRequiredMixin, SingleTableMixin, DetailView):
+class UserSubmissionDetailView(LoginRequiredMixin, PlayerGameMixin, SingleTableMixin, DetailView):
     model = Submission
     table_class = UserSubmissionTable
     template_name = "misterx/user_submission_detail.html"
@@ -453,19 +504,28 @@ class UserSubmissionDetailView(LoginRequiredMixin, SingleTableMixin, DetailView)
     def get_table_data(self):
         obj = self.object
         own_submissions = Submission.objects.filter(game=obj.game, task=obj.task, group=obj.group).exclude(pk=obj.pk)
-        own_submissions_filter = UserSubmissionFilter(self.request.GET, own_submissions, prefix="own")
+        own_submissions_filter = UserSubmissionFilter(self.request.GET, own_submissions, prefix="own", exclude=["task"])
         self.filter = own_submissions_filter
         return own_submissions_filter.qs
+
+    # Hide the columns left out of the filter like FilteredMultiTableMixin
+    def get_table(self, **kwargs):
+        table = super().get_table(**kwargs)
+        table.exclude = self.filter.excluded
+        return table
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({"filter": self.filter})
         return context
 
-    def get(self, request, *args, **kwargs):
-        if self.get_object().group not in self.request.user.groups.all():
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        if not self.request.user.groups.filter(pk=obj.group_id).exists():
             raise PermissionDenied("You are not in the group of this Submission")
-        return super().get(request, *args, **kwargs)
+        # Players in more than one group of the game must not see anything of it
+        self.get_group(obj.game)
+        return obj
 
 
 class UserTaskListView(LoginRequiredMixin, PlayerGameMixin, SingleTableMixin, FilterView):

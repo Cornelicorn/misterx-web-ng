@@ -17,12 +17,14 @@
     </a>
 {% endblock object_buttons %}
 
+{% block alerts %}
+    {% include "misterx/includes/multiple_groups_warning.html" %}
+{% endblock alerts %}
+
 {% block specific_content %}
     <div class="card mb-4">
         <div class="card-header">
-            <h3 class="card-title">
-                <strong>{% trans "Submission information" %}</strong>
-            </h3>
+            <h2 class="card-title">{% trans "Submission information" %}</h2>
         </div>
         <div class="card-body">
             <div class="datagrid">
@@ -31,12 +33,16 @@
                     <div class="datagrid-content">{{ object.group }}</div>
                 </div>
                 <div class="datagrid-item">
+                    <div class="datagrid-title">{% trans "Game" %}</div>
+                    <div class="datagrid-content">{{ object.game }}</div>
+                </div>
+                <div class="datagrid-item">
                     <div class="datagrid-title">{% trans "Task" %}</div>
                     <div class="datagrid-content">{{ object.task }}</div>
                 </div>
                 <div class="datagrid-item">
-                    <div class="datagrid-title">{% trans "Game" %}</div>
-                    <div class="datagrid-content">{{ object.game }}</div>
+                    <div class="datagrid-title">{% trans "Submitter" %}</div>
+                    <div class="datagrid-content">{{ object.submitter | default:"—" }}</div>
                 </div>
                 <div class="datagrid-item">
                     <div class="datagrid-title">{% trans "Time" %}</div>
@@ -44,7 +50,7 @@
                 </div>
                 <div class="datagrid-item">
                     <div class="datagrid-title">{% trans "Accepted" %}</div>
-                    <div class="datagrid-content">{{ object.accepted | yesno:_("Yes,No,Not yet reviewed") }}</div>
+                    <div class="datagrid-content">{{ object.accepted | yesno:_("Yes,No,Unreviewed") }}</div>
                 </div>
                 <div class="datagrid-item">
                     <div class="datagrid-title">{% trans "Points overridden" %}</div>
@@ -62,7 +68,7 @@
 
     {% trans "This group has only submitted this task once." as empty_title %}
     {% trans "If you didn't accept it, wait for the group to submit it again." as empty_subtitle %}
-    {% trans "Other Submissions by this group" as table_heading %}
+    {% trans "Other submissions by this group" as table_heading %}
     {% include "tables/table_card.html" with table=tables.0 filter=filters.0 id_filter_modal="id_filter_own" %}
 
     {% trans "Other groups haven't submitted this task yet." as empty_title %}

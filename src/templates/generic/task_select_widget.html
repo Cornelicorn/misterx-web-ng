@@ -1,27 +1,27 @@
 {% load static %}
 {% load i18n %}
 
-<div class="row">
-    <div class="col-6">
+<div class="row row-cards">
+    <div class="col-12 col-md-6">
         <div class="card">
             <div class="card-header">
-                <h5 class="card-title">{% trans "Available Tasks" %}</h5>
+                <h5 class="card-title">{% trans "Available tasks" %}</h5>
             </div>
             <div class="card-body">
                 <ul class="list-group list-group-flush task-select-list" id="unselected_tasks">
-                    {% for task in widget.unselected_tasks %}<li class="list-group-item" value="{{ task.pk }}">{{ task.task }}</li>{% endfor %}
+                    {% for task in widget.unselected_tasks %}<li class="list-group-item" value="{{ task.pk }}">{{ task }}</li>{% endfor %}
                 </ul>
             </div>
         </div>
     </div>
-    <div class="col-6">
+    <div class="col-12 col-md-6">
         <div class="card">
             <div class="card-header">
-                <h5 class="card-title">{% trans "Selected Tasks" %}</h5>
+                <h5 class="card-title">{% trans "Selected tasks" %}</h5>
             </div>
             <div class="card-body">
                 <ul class="list-group list-group-flush task-select-list" id="selected_tasks">
-                    {% for task in widget.selected_tasks %}<li class="list-group-item" value="{{ task.pk }}">{{ task.task }}</li>{% endfor %}
+                    {% for task in widget.selected_tasks %}<li class="list-group-item" value="{{ task.pk }}">{{ task }}</li>{% endfor %}
                 </ul>
             </div>
         </div>

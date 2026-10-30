@@ -37,7 +37,14 @@
         </header>
         <hr>
         <main class="page-body">
-            {% include "tables/table_card.html" %}
+
+            {% block alerts %}
+            {% endblock alerts %}
+
+            {% block table %}
+                {% include "tables/table_card.html" %}
+            {% endblock table %}
+
         </main>
     {% endwith %}
 {% endblock content %}

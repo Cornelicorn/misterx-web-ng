@@ -7,3 +7,8 @@
         {% trans "Submit a Task" %}
     </a>
 {% endblock createbutton %}
+
+{% block table %}
+    {% trans "Try adjusting the filters or submit a task." as empty_subtitle %}
+    {{ block.super }}
+{% endblock table %}

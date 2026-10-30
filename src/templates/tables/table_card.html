@@ -6,7 +6,7 @@
 <div class="card mb-4">
     {% if table_heading %}
         <div class="card-header">
-            <h{{ heading_size | default:"2" }} class="card-title">{{ table_heading }}</h{{ heading_size | default:"2" }}>
+            <h2 class="card-title">{{ table_heading }}</h2>
             <div class="card-actions">
                 {% include "tables/filter_button.html" %}
             </div>

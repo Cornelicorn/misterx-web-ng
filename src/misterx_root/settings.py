@@ -146,7 +146,7 @@ SOCIAL_AUTH_PIPELINE = (
     "social_core.pipeline.social_auth.associate_user",
     "social_core.pipeline.social_auth.load_extra_data",
     "social_core.pipeline.user.user_details",
-    "utilities.auth_pipeline.oidc.assign_groups_and_attributes",
+    "utilities.auth_pipeline.oidc.assign_attributes",
 )
 
 # Redirect to the start page after login, which redirects players and staff to their respective start page
