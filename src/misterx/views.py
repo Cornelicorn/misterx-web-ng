@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.db import models, transaction
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import DeleteView, DetailView, UpdateView
@@ -201,6 +201,17 @@ class SubmissionCreateView(LoginRequiredMixin, PermissionRequiredMixin, InitialC
 
 class GameSubmissionCreateView(SubmissionCreateView):
     form_class = GameSubmissionForm
+
+    # The "Add Submission" button of a game passes the game and group in the query string
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        try:
+            game = Game.objects.get(pk=self.request.GET.get("game"))
+            group = game.groups.get(pk=self.request.GET.get("group"))
+        except (ObjectDoesNotExist, ValueError):
+            raise Http404()
+        kwargs["instance"] = Submission(game=game, group=group)
+        return kwargs
 
 
 class SubmissionEditView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):

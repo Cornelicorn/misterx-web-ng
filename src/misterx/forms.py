@@ -13,6 +13,10 @@ from utilities.templatetags.utilities_media import get_main_mime_type
 from .models import Game, OrderedTask, Player, PlayerGroup, Submission, Task
 
 
+def get_task_choices(game: Game) -> list[tuple[int, str]]:
+    return [(t.task_id, str(t)) for t in OrderedTask.objects.filter(game=game).select_related("task")]
+
+
 class TaskSelectWidget(forms.SelectMultiple):
     template_name = "generic/task_select_widget.html"
 
@@ -192,17 +196,26 @@ class SubmissionApproveForm(SubmissionForm):
 class GameSubmissionForm(SubmissionForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for field in "game", "group", "accepted", "explanation", "feedback":
+        for field in "accepted", "explanation", "feedback":
             self.fields[field].widget = forms.HiddenInput()
 
-        # Limit displayed tasks to the tasks in the given game
-        game = Game.objects.get(pk=kwargs.get("initial").get("game"))
-        self.fields["task"].choices = (
-            (t.task.id, str(t)) for t in OrderedTask.objects.filter(game=game, task__in=game.tasks.all())
-        )
-        # Limit displayed submitters to the ones in the given group
-        group = PlayerGroup.objects.get(pk=kwargs.get("initial").get("group"))
+        group = self.instance.group
+        self.helper.title = _("Submission for {group}").format(group=group)
+        # Limit displayed tasks to the tasks in the game and submitters to the players in the group
+        self.fields["task"].choices = get_task_choices(self.instance.game)
         self.fields["submitter"].choices = group.user_set.all().values_list("pk", "username")
+
+    # Game and group are set by the view
+    class Meta:
+        model = Submission
+        fields = [
+            "task",
+            "submitter",
+            "accepted",
+            "points_override",
+            "explanation",
+            "feedback",
+        ]
 
 
 class PlayerForm(forms.ModelForm):
@@ -261,10 +274,7 @@ class UserSubmissionForm(SubmissionForm):
         super().__init__(*args, **kwargs)
 
         # Limit displayed tasks to the tasks in the game of the submission
-        game = self.instance.game
-        self.fields["task"].choices = (
-            (t.task.id, str(t)) for t in OrderedTask.objects.filter(game=game, task__in=game.tasks.all())
-        )
+        self.fields["task"].choices = get_task_choices(self.instance.game)
 
     # Game, group and submitter are set by the view and new submissions stay unreviewed, they must not
     # be form fields, as players could change them in the submitted data otherwise.
