@@ -79,6 +79,34 @@ class PlayerGameMixin:
             return render(request, "misterx/no_active_game.html")
 
 
+class FilteredMultiTableMixin(MultiTableMixin):
+    """
+    Provides the filters of the tables to the template, get_tables_data() has to store them in self.filters
+    """
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({"filters": self.filters})
+        return context
+
+
+class RelatedSubmissionsMixin(FilteredMultiTableMixin):
+    """
+    Lists the other submissions of the group and the submissions of the other groups for the task of the submission
+    """
+
+    tables = SubmissionTable, SubmissionTable
+
+    def get_tables_data(self):
+        obj = self.object
+        own_submissions = Submission.objects.filter(game=obj.game, task=obj.task, group=obj.group).exclude(pk=obj.pk)
+        other_submissions = Submission.objects.filter(game=obj.game, task=obj.task).exclude(group=obj.group)
+        own_submissions_filter = SubmissionFilter(self.request.GET, own_submissions, prefix="own")
+        other_submissions_filter = SubmissionFilter(self.request.GET, other_submissions, prefix="other")
+        self.filters = own_submissions_filter, other_submissions_filter
+        return own_submissions_filter.qs, other_submissions_filter.qs
+
+
 class GameListView(LoginRequiredMixin, PermissionListMixin, SingleTableMixin, FilterView):
     model = Game
     permission_required = "misterx.view_game"
@@ -102,7 +130,7 @@ class GameEditView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     form_class = GameForm
 
 
-class GameDetailView(LoginRequiredMixin, PermissionRequiredMixin, MultiTableMixin, DetailView):
+class GameDetailView(LoginRequiredMixin, PermissionRequiredMixin, FilteredMultiTableMixin, DetailView):
     model = Game
     permission_required = "misterx.view_game"
     tables = GamePlayerGroupTable, OrderedTaskTable, SubmissionTable
@@ -122,11 +150,6 @@ class GameDetailView(LoginRequiredMixin, PermissionRequiredMixin, MultiTableMixi
         submissions = SubmissionFilter(self.request.GET, game.submissions.all(), prefix="submissions")
         self.filters = groups, tasks, submissions
         return groups.qs, tasks.qs, submissions.qs
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update({"filters": self.filters})
-        return context
 
 
 class GameDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
@@ -159,7 +182,7 @@ class TaskEditView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     form_class = TaskForm
 
 
-class TaskDetailView(LoginRequiredMixin, PermissionRequiredMixin, MultiTableMixin, DetailView):
+class TaskDetailView(LoginRequiredMixin, PermissionRequiredMixin, FilteredMultiTableMixin, DetailView):
     model = Task
     permission_required = "misterx.view_task"
     tables = GameTable, SubmissionTable
@@ -169,11 +192,6 @@ class TaskDetailView(LoginRequiredMixin, PermissionRequiredMixin, MultiTableMixi
         submissions = SubmissionFilter(self.request.GET, self.object.submissions.all(), prefix="submissions")
         self.filters = games, submissions
         return games.qs, submissions.qs
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update({"filters": self.filters})
-        return context
 
 
 class TaskDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
@@ -221,47 +239,17 @@ class SubmissionEditView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView
     form_class = SubmissionForm
 
 
-class SubmissionDetailView(LoginRequiredMixin, PermissionRequiredMixin, MultiTableMixin, DetailView):
+class SubmissionDetailView(LoginRequiredMixin, PermissionRequiredMixin, RelatedSubmissionsMixin, DetailView):
     model = Submission
     permission_required = "misterx.view_submission"
-    tables = SubmissionTable, SubmissionTable
-
-    def get_tables_data(self):
-        obj = self.object
-        own_submissions = Submission.objects.filter(game=obj.game, task=obj.task, group=obj.group).exclude(pk=obj.pk)
-        other_submissions = Submission.objects.filter(game=obj.game, task=obj.task).exclude(group=obj.group)
-        own_submissions_filter = SubmissionFilter(self.request.GET, own_submissions, prefix="own")
-        other_submissions_filter = SubmissionFilter(self.request.GET, other_submissions, prefix="other")
-        self.filters = own_submissions_filter, other_submissions_filter
-        return own_submissions_filter.qs, other_submissions_filter.qs
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update({"filters": self.filters})
-        return context
 
 
-class SubmissionApproveView(LoginRequiredMixin, PermissionRequiredMixin, MultiTableMixin, UpdateView):
+class SubmissionApproveView(LoginRequiredMixin, PermissionRequiredMixin, RelatedSubmissionsMixin, UpdateView):
     model = Submission
     form_class = SubmissionApproveForm
     permission_required = "misterx.change_submission"
     permission_object = None
     template_name = "misterx/submission_approve.html"
-    tables = SubmissionTable, SubmissionTable
-
-    def get_tables_data(self):
-        obj = self.object
-        own_submissions = Submission.objects.filter(game=obj.game, task=obj.task, group=obj.group).exclude(pk=obj.pk)
-        other_submissions = Submission.objects.filter(game=obj.game, task=obj.task).exclude(group=obj.group)
-        own_submissions_filter = SubmissionFilter(self.request.GET, own_submissions, prefix="own")
-        other_submissions_filter = SubmissionFilter(self.request.GET, other_submissions, prefix="other")
-        self.filters = own_submissions_filter, other_submissions_filter
-        return own_submissions_filter.qs, other_submissions_filter.qs
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update({"filters": self.filters})
-        return context
 
     def get_object(self, queryset=None):
         try:
@@ -350,7 +338,7 @@ class PlayerEditView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     form_class = PlayerForm
 
 
-class PlayerDetailView(LoginRequiredMixin, PermissionRequiredMixin, MultiTableMixin, DetailView):
+class PlayerDetailView(LoginRequiredMixin, PermissionRequiredMixin, FilteredMultiTableMixin, DetailView):
     model = Player
     permission_required = "auth.view_user"
     tables = PlayerGroupTable, GameTable
@@ -360,11 +348,6 @@ class PlayerDetailView(LoginRequiredMixin, PermissionRequiredMixin, MultiTableMi
         games = GameFilter(self.request.GET, Game.objects.filter(groups__in=groups.qs), prefix="games")
         self.filters = groups, games
         return groups.qs, games.qs
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update({"filters": self.filters})
-        return context
 
 
 class PlayerDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
@@ -397,7 +380,7 @@ class PlayerGroupEditView(LoginRequiredMixin, PermissionRequiredMixin, UpdateVie
     form_class = PlayerGroupForm
 
 
-class PlayerGroupDetailView(LoginRequiredMixin, PermissionRequiredMixin, MultiTableMixin, DetailView):
+class PlayerGroupDetailView(LoginRequiredMixin, PermissionRequiredMixin, FilteredMultiTableMixin, DetailView):
     model = PlayerGroup
     permission_required = "auth.view_group"
     tables = PlayerTable, GameTable
@@ -407,11 +390,6 @@ class PlayerGroupDetailView(LoginRequiredMixin, PermissionRequiredMixin, MultiTa
         games = GameFilter(self.request.GET, self.object.games.all(), prefix="games")
         self.filters = users, games
         return users.qs, games.qs
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update({"filters": self.filters})
-        return context
 
 
 class PlayerGroupDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
