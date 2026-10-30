@@ -6,21 +6,21 @@
 {% endblock page-pretitle %}
 
 {% block specific_content %}
-<div class="card">
-    <div class="alert alert-important alert-danger mb-0">
+    <div class="card">
+        <div class="alert alert-important alert-danger mb-0">
 
-        <form method="post">
-            {% csrf_token %}
-            <p>
-                {% trans "You are about to delete" %}
-                <br>
-                <strong>{{ object }}</strong>
-                <br>
-                {% trans "Are you sure you want to do this?" %}
-            </p>
-            <a href="{{ object.get_absolute_url }}" class="btn btn-light">{% trans "Cancel" %}</a>
-            <button class="btn btn-dark" type="submit">{% trans "Confirm" %}</button>
-        </form>
+            <form method="post">
+                {% csrf_token %}
+                <p>
+                    {% trans "You are about to delete" %}
+                    <br>
+                    <strong>{{ object }}</strong>
+                    <br>
+                    {% trans "Are you sure you want to do this?" %}
+                </p>
+                <a href="{{ object.get_absolute_url }}" class="btn btn-light">{% trans "Cancel" %}</a>
+                <button class="btn btn-dark" type="submit">{% trans "Confirm" %}</button>
+            </form>
+        </div>
     </div>
-</div>
 {% endblock specific_content %}
