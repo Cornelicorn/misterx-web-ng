@@ -5,15 +5,10 @@
 {% block body %}
     <div class="page page-center">
         <div class="container container-tight py-5">
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">{% trans "You have been logged out" %}</h2>
-                </div>
-                <div class="card-body">
-                    <p>{% trans "You can login again by pressing the button below." %}</p>
-                </div>
-                <div class="card-footer">
-                    <a href="{% url "login" %}" class="btn btn-primary w-100">{% trans "Login" %}</a>
+            <div class="empty">
+                <p class="empty-title">{% trans "You have been logged out" %}</p>
+                <div class="empty-action">
+                    <a href="{% url "login" %}" class="btn btn-primary">{% trans "Login again" %}</a>
                 </div>
             </div>
         </div>
