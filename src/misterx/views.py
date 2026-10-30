@@ -81,8 +81,16 @@ class PlayerGameMixin:
 
 class FilteredMultiTableMixin(MultiTableMixin):
     """
-    Provides the filters of the tables to the template, get_tables_data() has to store them in self.filters
+    Provides the filters of the tables to the template, get_tables_data() has to store them in self.filters.
+    The columns of fields left out of a filter with exclude are hidden as well, as they have the same value in
+    every row.
     """
+
+    def get_tables(self):
+        tables = super().get_tables()
+        for table, filterset in zip(tables, self.filters):
+            table.exclude = (*table.exclude, *getattr(filterset, "excluded", ()))
+        return tables
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -101,8 +109,12 @@ class RelatedSubmissionsMixin(FilteredMultiTableMixin):
         obj = self.object
         own_submissions = Submission.objects.filter(game=obj.game, task=obj.task, group=obj.group).exclude(pk=obj.pk)
         other_submissions = Submission.objects.filter(game=obj.game, task=obj.task).exclude(group=obj.group)
-        own_submissions_filter = SubmissionFilter(self.request.GET, own_submissions, prefix="own")
-        other_submissions_filter = SubmissionFilter(self.request.GET, other_submissions, prefix="other")
+        own_submissions_filter = SubmissionFilter(
+            self.request.GET, own_submissions, prefix="own", exclude=["group", "game", "task"]
+        )
+        other_submissions_filter = SubmissionFilter(
+            self.request.GET, other_submissions, prefix="other", exclude=["game", "task"]
+        )
         self.filters = own_submissions_filter, other_submissions_filter
         return own_submissions_filter.qs, other_submissions_filter.qs
 
@@ -148,7 +160,7 @@ class GameDetailView(LoginRequiredMixin, PermissionRequiredMixin, FilteredMultiT
             ).order_by("task_number"),
             prefix="tasks",
         )
-        submissions = SubmissionFilter(self.request.GET, game.submissions.all(), prefix="submissions")
+        submissions = SubmissionFilter(self.request.GET, game.submissions.all(), prefix="submissions", exclude=["game"])
         self.filters = groups, tasks, submissions
         return groups.qs, tasks.qs, submissions.qs
 
@@ -191,7 +203,7 @@ class TaskDetailView(LoginRequiredMixin, PermissionRequiredMixin, FilteredMultiT
 
     def get_tables_data(self):
         games = GameFilter(self.request.GET, self.object.games.all(), prefix="games")
-        submissions = SubmissionFilter(self.request.GET, self.object.submissions.all(), prefix="submissions")
+        submissions = SubmissionFilter(self.request.GET, self.object.submissions.all(), prefix="submissions", exclude=["task"])
         self.filters = games, submissions
         return games.qs, submissions.qs
 
@@ -447,9 +459,15 @@ class UserSubmissionDetailView(LoginRequiredMixin, SingleTableMixin, DetailView)
     def get_table_data(self):
         obj = self.object
         own_submissions = Submission.objects.filter(game=obj.game, task=obj.task, group=obj.group).exclude(pk=obj.pk)
-        own_submissions_filter = UserSubmissionFilter(self.request.GET, own_submissions, prefix="own")
+        own_submissions_filter = UserSubmissionFilter(self.request.GET, own_submissions, prefix="own", exclude=["task"])
         self.filter = own_submissions_filter
         return own_submissions_filter.qs
+
+    # Hide the columns left out of the filter like FilteredMultiTableMixin
+    def get_table(self, **kwargs):
+        table = super().get_table(**kwargs)
+        table.exclude = self.filter.excluded
+        return table
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
