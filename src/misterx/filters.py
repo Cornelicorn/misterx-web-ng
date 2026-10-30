@@ -5,6 +5,19 @@ from .forms import FilterForm
 from .models import Game, Player, PlayerGroup, Submission, Task
 
 
+class ExcludeFilterSet(FilterSet):
+    """
+    Leaves out the filters of the fields given in exclude, which have the same value for all objects, e.g. the game
+    of the submissions of a game. FilteredMultiTableMixin also hides their columns.
+    """
+
+    def __init__(self, *args, exclude=(), **kwargs):
+        super().__init__(*args, **kwargs)
+        self.excluded = tuple(exclude)
+        for name in self.excluded:
+            del self.filters[name]
+
+
 class GameFilter(FilterSet):
     name = CharFilter(lookup_expr="icontains")
 
@@ -43,7 +56,7 @@ class UserTaskFilter(FilterSet):
         ]
 
 
-class SubmissionFilter(FilterSet):
+class SubmissionFilter(ExcludeFilterSet):
     accepted = ChoiceFilter(null_label=_("Unreviewed"), choices=((True, _("Yes")), (False, _("No"))))
     explanation = CharFilter(lookup_expr="icontains")
     feedback = CharFilter(lookup_expr="icontains")
@@ -51,9 +64,10 @@ class SubmissionFilter(FilterSet):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in "group", "game", "task", "submitter":
-            self.filters[field].queryset = (
-                self.filters[field].queryset.filter(id__in=self.queryset.values_list(field, flat=True)).distinct()
-            )
+            if field in self.filters:
+                self.filters[field].queryset = (
+                    self.filters[field].queryset.filter(id__in=self.queryset.values_list(field, flat=True)).distinct()
+                )
 
     class Meta:
         model = Submission
@@ -97,7 +111,7 @@ class PlayerGroupFilter(FilterSet):
         ]
 
 
-class UserSubmissionFilter(FilterSet):
+class UserSubmissionFilter(ExcludeFilterSet):
     accepted = ChoiceFilter(null_label=_("Unreviewed"), choices=((True, _("Yes")), (False, _("No"))))
     explanation = CharFilter(lookup_expr="icontains")
     feedback = CharFilter(lookup_expr="icontains")
@@ -105,9 +119,10 @@ class UserSubmissionFilter(FilterSet):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in "task", "submitter":
-            self.filters[field].queryset = (
-                self.filters[field].queryset.filter(id__in=self.queryset.values_list(field, flat=True)).distinct()
-            )
+            if field in self.filters:
+                self.filters[field].queryset = (
+                    self.filters[field].queryset.filter(id__in=self.queryset.values_list(field, flat=True)).distinct()
+                )
 
     class Meta:
         model = Submission
