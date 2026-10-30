@@ -451,10 +451,11 @@ class UserSubmissionDetailView(LoginRequiredMixin, SingleTableMixin, DetailView)
         context.update({"filter": self.filter})
         return context
 
-    def get(self, request, *args, **kwargs):
-        if self.get_object().group not in self.request.user.groups.all():
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        if not self.request.user.groups.filter(pk=obj.group_id).exists():
             raise PermissionDenied("You are not in the group of this Submission")
-        return super().get(request, *args, **kwargs)
+        return obj
 
 
 class UserTaskListView(LoginRequiredMixin, PlayerGameMixin, SingleTableMixin, FilterView):
