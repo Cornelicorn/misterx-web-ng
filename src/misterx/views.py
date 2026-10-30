@@ -8,7 +8,7 @@ from django.views.generic import DeleteView, DetailView, UpdateView
 from django.views.static import serve
 from django_filters.views import FilterView
 from django_tables2 import MultiTableMixin, SingleTableMixin
-from guardian.mixins import LoginRequiredMixin, PermissionListMixin, PermissionRequiredMixin
+from guardian.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
 from utilities.views import InitialCreateView
 
@@ -107,9 +107,10 @@ class RelatedSubmissionsMixin(FilteredMultiTableMixin):
         return own_submissions_filter.qs, other_submissions_filter.qs
 
 
-class GameListView(LoginRequiredMixin, PermissionListMixin, SingleTableMixin, FilterView):
+class GameListView(LoginRequiredMixin, PermissionRequiredMixin, SingleTableMixin, FilterView):
     model = Game
     permission_required = "misterx.view_game"
+    permission_object = None
     table_class = GameTable
     template_name = "misterx/game_list.html"
     filterset_class = GameFilter
@@ -159,9 +160,10 @@ class GameDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     template_name = "generic/object_confirm_delete.html"
 
 
-class TaskListView(LoginRequiredMixin, PermissionListMixin, SingleTableMixin, FilterView):
+class TaskListView(LoginRequiredMixin, PermissionRequiredMixin, SingleTableMixin, FilterView):
     model = Task
     permission_required = "misterx.view_task"
+    permission_object = None
     table_class = TaskTable
     template_name = "misterx/task_list.html"
     filterset_class = TaskFilter
@@ -201,9 +203,10 @@ class TaskDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     template_name = "generic/object_confirm_delete.html"
 
 
-class SubmissionListView(LoginRequiredMixin, PermissionListMixin, SingleTableMixin, FilterView):
+class SubmissionListView(LoginRequiredMixin, PermissionRequiredMixin, SingleTableMixin, FilterView):
     model = Submission
     permission_required = "misterx.view_submission"
+    permission_object = None
     table_class = SubmissionTable
     template_name = "misterx/submission_list.html"
     filterset_class = SubmissionFilter
@@ -315,9 +318,10 @@ class SubmissionDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteVi
     template_name = "generic/object_confirm_delete.html"
 
 
-class PlayerListView(LoginRequiredMixin, PermissionListMixin, SingleTableMixin, FilterView):
+class PlayerListView(LoginRequiredMixin, PermissionRequiredMixin, SingleTableMixin, FilterView):
     model = Player
     permission_required = "auth.view_user"
+    permission_object = None
     table_class = PlayerTable
     template_name = "misterx/player_list.html"
     filterset_class = PlayerFilter
@@ -357,9 +361,10 @@ class PlayerDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     template_name = "generic/object_confirm_delete.html"
 
 
-class PlayerGroupListView(LoginRequiredMixin, PermissionListMixin, SingleTableMixin, FilterView):
+class PlayerGroupListView(LoginRequiredMixin, PermissionRequiredMixin, SingleTableMixin, FilterView):
     model = PlayerGroup
     permission_required = "auth.view_group"
+    permission_object = None
     table_class = PlayerGroupTable
     template_name = "misterx/playergroup_list.html"
     filterset_class = PlayerGroupFilter
