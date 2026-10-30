@@ -16,10 +16,10 @@
                 <br>
                 <strong>{{ object }}</strong>
                 <br>
-                {% trans "Are you sure you want to do this" %}?
+                {% trans "Are you sure you want to do this?" %}
             </p>
             <a href="{{ object.get_absolute_url }}" class="btn btn-light">{% trans "Cancel" %}</a>
-            <input class="btn btn-dark" role="button" type="submit" value="Confirm">
+            <button class="btn btn-dark" type="submit">{% trans "Confirm" %}</button>
         </form>
     </div>
 </div>

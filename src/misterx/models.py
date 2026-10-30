@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Count, UniqueConstraint
+from django.db.models import UniqueConstraint
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
@@ -44,22 +44,16 @@ class Task(models.Model):
         return reverse("misterx:task-detail", kwargs={"pk": self.id})
 
     def has_been_completed(self, game: "Game") -> bool:
-        if game.submissions.filter(task=self, accepted=True).count():
-            return True
-        else:
-            return False
+        return game.submissions.filter(task=self, accepted=True).exists()
 
     def completed_by_group(self, game: "Game", group: PlayerGroup) -> bool:
-        if game.submissions.filter(task=self, accepted=True, group=group).count():
-            return True
-        else:
-            return False
+        return game.submissions.filter(task=self, accepted=True, group=group).exists()
 
 
 class OrderedTask(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
     game = models.ForeignKey("Game", on_delete=models.CASCADE)
-    task_number = models.IntegerField(verbose_name="Task number", null=True, blank=True)
+    task_number = models.IntegerField(verbose_name=_("Task number"), null=True, blank=True)
 
     def __str__(self):
         return f"{self.task_number or 'Unordered'}: {self.task}"
@@ -76,7 +70,7 @@ class OrderedTask(models.Model):
 
 class Game(models.Model):
     tasks = models.ManyToManyField(Task, related_name="games", blank=True, through=OrderedTask)
-    name = models.CharField(_("Name of Task Set"), max_length=255, default=get_default_game_name)
+    name = models.CharField(_("Name"), max_length=255, default=get_default_game_name)
     date = models.DateField(_("Date of the game"), default=date.today)
     groups = models.ManyToManyField(PlayerGroup, related_name="games", blank=True)
     active = models.BooleanField(
@@ -109,14 +103,14 @@ class Submission(models.Model):
     group = models.ForeignKey(PlayerGroup, related_name="submissions", on_delete=models.CASCADE)
     game = models.ForeignKey(Game, related_name="submissions", on_delete=models.CASCADE)
     task = models.ForeignKey(Task, related_name="submissions", on_delete=models.CASCADE)
-    time = models.DateTimeField(_("Time"), help_text=_("Time of submission"), auto_now=True)
+    time = models.DateTimeField(_("Time"), help_text=_("Time of submission"), auto_now_add=True)
     submitter = models.ForeignKey(Player, related_name="submissions", null=True, on_delete=models.SET_NULL)
     accepted = models.BooleanField(
         _("Accepted"), help_text=_("Whether the solution was accepted"), null=True, blank=True, default=None
     )
     points_override = models.PositiveIntegerField(
         _("Granted points override"),
-        help_text="Override the number of points the group will receive for this submission",
+        help_text=_("Override the number of points the group will receive for this submission"),
         null=True,
         blank=True,
         default=None,
@@ -130,12 +124,19 @@ class Submission(models.Model):
 
     @property
     def granted_points(self) -> int:
-        first_accepted = Submission.objects.filter(game=self.game, task=self.task, group=self.group).order_by("time").filter(accepted=True).first()
         if not self.accepted:
             return 0
         elif self.points_override is not None:
             return self.points_override
-        elif first_accepted is not None and first_accepted.pk != self.pk:
+
+        # Only the first accepted submission of a group for a task is awarded points
+        first_accepted = (
+            Submission.objects.filter(game=self.game, task=self.task, group=self.group)
+            .order_by("time")
+            .filter(accepted=True)
+            .first()
+        )
+        if first_accepted is not None and first_accepted.pk != self.pk:
             return 0
         else:
             return self.task.points
@@ -173,5 +174,5 @@ def get_upload_path(instance: "Upload", filename: str):
 
 class Upload(models.Model):
     submission = models.ForeignKey("Submission", on_delete=models.CASCADE, related_name="proofs")
-    uuid = models.UUIDField(verbose_name="UUID for upload", default=uuid.uuid4, editable=False)
-    file = models.FileField("File", upload_to=get_upload_path)
+    uuid = models.UUIDField(verbose_name=_("UUID for upload"), default=uuid.uuid4, editable=False)
+    file = models.FileField(_("File"), upload_to=get_upload_path)

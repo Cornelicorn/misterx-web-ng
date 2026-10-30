@@ -52,6 +52,7 @@ urlpatterns = [
     path("tasks/<slug:pk>/delete", TaskDeleteView.as_view(), name="task-delete"),
     path("submissions/", SubmissionListView.as_view(), name="submission-list"),
     path("submissions/approve", SubmissionApproveView.as_view(), name="submission-approve"),
+    path("submissions/approve/<int:pk>", SubmissionApproveView.as_view(), name="submission-approve"),
     path("submissions/create", SubmissionCreateView.as_view(), name="submission-create"),
     path("submissions/<slug:pk>", SubmissionDetailView.as_view(), name="submission-detail"),
     path("submissions/<slug:pk>/edit", SubmissionEditView.as_view(), name="submission-edit"),
@@ -73,7 +74,7 @@ urlpatterns = [
     re_path(
         r"^{prefix}(?P<path>.*)$".format(prefix=re.escape(settings.MEDIA_URL.lstrip("/"))),
         serve_proofs,
-        kwargs={"document_root": settings.MEDIA_ROOT}
+        kwargs={"document_root": settings.MEDIA_ROOT},
     ),
 ]
 

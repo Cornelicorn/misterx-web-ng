@@ -51,7 +51,6 @@ class GameTable(tables.Table):
 class TaskTable(tables.Table):
     open = OpenColumn("misterx:task-detail")
     edit = EditColumn("misterx:task-edit")
-    per_page = 1
 
     class Meta:
         model = Task
@@ -81,7 +80,7 @@ class OrderedTaskTable(TaskTable):
 
 class UserTaskTable(tables.Table):
     task_number = tables.Column(attrs={"th": {"class": "w-1"}})
-    completed = tables.BooleanColumn()
+    submitted = tables.BooleanColumn()
     add = AddSubmissionForTaskColumn()
 
     class Meta:
@@ -90,7 +89,7 @@ class UserTaskTable(tables.Table):
             "task_number",
             "task",
             "points",
-            "completed",
+            "submitted",
         ]
 
 

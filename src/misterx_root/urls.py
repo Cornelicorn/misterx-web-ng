@@ -25,7 +25,7 @@ from .views import login_or_redirect
 
 urlpatterns = [
     path("", include("social_django.urls", namespace="social")),
-    path("", login_or_redirect),
+    path("", login_or_redirect, name="index"),
     path("i18n/", include("django.conf.urls.i18n")),
     path("admin/", admin.site.urls),
     path(

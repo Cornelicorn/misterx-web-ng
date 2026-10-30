@@ -1,0 +1,19 @@
+{% extends "base/layout.html" %}
+
+{% load i18n %}
+
+{% block content %}
+    <main class="page-body">
+        <div class="empty">
+            <p class="empty-title">{% trans "This submission has already been reviewed" %}</p>
+            {% if request.method == "POST" %}
+                <p class="empty-subtitle text-secondary">
+                    {% trans "Someone else reviewed it in the meantime, your decision was not saved." %}
+                </p>
+            {% endif %}
+            <div class="empty-action">
+                <a href="{% url "misterx:submission-approve" %}" class="btn btn-primary">{% trans "Review next submission" %}</a>
+            </div>
+        </div>
+    </main>
+{% endblock content %}

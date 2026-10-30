@@ -1,13 +1,12 @@
+from django.conf import settings
 from django.shortcuts import redirect
-
-from .settings import LOGIN_REDIRECT_URL, LOGIN_REDIRECT_URL_STAFF
 
 
 def login_or_redirect(request):
     if request.user.is_authenticated:
         if request.user.is_staff:
-            return redirect(LOGIN_REDIRECT_URL_STAFF)
+            return redirect(settings.LOGIN_REDIRECT_URL_STAFF)
         else:
-            return redirect(LOGIN_REDIRECT_URL)
+            return redirect(settings.LOGIN_REDIRECT_URL_PLAYER)
     else:
-        return redirect("accounts/login")
+        return redirect("login")

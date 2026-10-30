@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
-from django.db import models
+from django.db import models, transaction
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.urls import reverse_lazy
@@ -53,6 +53,32 @@ class NoUnreviewedSubmissions(Exception):
     pass
 
 
+class SubmissionAlreadyReviewed(Exception):
+    pass
+
+
+class PlayerGameMixin:
+    """
+    Provides the active game and group of the requesting player and shows a
+    notice instead of the view if the player doesn't participate in a game
+    """
+
+    def get_game_and_group(self):
+        groups = self.request.user.groups.all()
+        try:
+            game = Game.objects.filter(groups__in=groups).get(active=True)
+        except ObjectDoesNotExist:
+            raise NoActiveGameError()
+        group = game.groups.intersection(groups).first()
+        return game, group
+
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            return super().dispatch(request, *args, **kwargs)
+        except NoActiveGameError:
+            return render(request, "misterx/no_active_game.html")
+
+
 class GameListView(LoginRequiredMixin, PermissionListMixin, SingleTableMixin, FilterView):
     model = Game
     permission_required = "misterx.view_game"
@@ -75,23 +101,6 @@ class GameEditView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     template_name = "generic/object_edit.html"
     form_class = GameForm
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        game = self.get_object()
-        selected_tasks = game.tasks.annotate(
-            task_number=models.Subquery(
-                OrderedTask.objects.filter(game=game, task__pk=models.OuterRef("pk")).values("task_number")
-            )
-        ).order_by("task_number")
-        unselected_tasks = Task.objects.exclude(pk__in=selected_tasks.values_list("pk", flat=True))
-        context.update(
-            {
-                "selected_tasks": selected_tasks,
-                "unselected_tasks": unselected_tasks,
-            }
-        )
-        return context
-
 
 class GameDetailView(LoginRequiredMixin, PermissionRequiredMixin, MultiTableMixin, DetailView):
     model = Game
@@ -99,7 +108,7 @@ class GameDetailView(LoginRequiredMixin, PermissionRequiredMixin, MultiTableMixi
     tables = GamePlayerGroupTable, OrderedTaskTable, SubmissionTable
 
     def get_tables_data(self):
-        game = self.get_object()
+        game = self.object
         groups = PlayerGroupFilter(self.request.GET, game.groups.all(), prefix="groups")
         tasks = TaskFilter(
             self.request.GET,
@@ -156,8 +165,8 @@ class TaskDetailView(LoginRequiredMixin, PermissionRequiredMixin, MultiTableMixi
     tables = GameTable, SubmissionTable
 
     def get_tables_data(self):
-        games = GameFilter(self.request.GET, self.get_object().games.all(), prefix="games")
-        submissions = SubmissionFilter(self.request.GET, self.get_object().submissions.all(), prefix="submissions")
+        games = GameFilter(self.request.GET, self.object.games.all(), prefix="games")
+        submissions = SubmissionFilter(self.request.GET, self.object.submissions.all(), prefix="submissions")
         self.filters = games, submissions
         return games.qs, submissions.qs
 
@@ -207,7 +216,7 @@ class SubmissionDetailView(LoginRequiredMixin, PermissionRequiredMixin, MultiTab
     tables = SubmissionTable, SubmissionTable
 
     def get_tables_data(self):
-        obj = self.get_object()
+        obj = self.object
         own_submissions = Submission.objects.filter(game=obj.game, task=obj.task, group=obj.group).exclude(pk=obj.pk)
         other_submissions = Submission.objects.filter(game=obj.game, task=obj.task).exclude(group=obj.group)
         own_submissions_filter = SubmissionFilter(self.request.GET, own_submissions, prefix="own")
@@ -230,7 +239,7 @@ class SubmissionApproveView(LoginRequiredMixin, PermissionRequiredMixin, MultiTa
     tables = SubmissionTable, SubmissionTable
 
     def get_tables_data(self):
-        obj = self.get_object()
+        obj = self.object
         own_submissions = Submission.objects.filter(game=obj.game, task=obj.task, group=obj.group).exclude(pk=obj.pk)
         other_submissions = Submission.objects.filter(game=obj.game, task=obj.task).exclude(group=obj.group)
         own_submissions_filter = SubmissionFilter(self.request.GET, own_submissions, prefix="own")
@@ -251,20 +260,40 @@ class SubmissionApproveView(LoginRequiredMixin, PermissionRequiredMixin, MultiTa
 
         if queryset is None:
             queryset = self.get_queryset()
+        queryset = queryset.filter(game=game, accepted=None)
 
-        obj = queryset.filter(game=game, accepted=None).first()
+        # A specific submission is requested when a decision is posted for the submission the reviewer
+        # was shown. Someone else might have reviewed it in the meantime, so only take it if it is still
+        # unreviewed and lock it until the decision is saved.
+        if "pk" in self.kwargs:
+            if self.request.method == "POST":
+                queryset = queryset.select_for_update()
+            obj = queryset.filter(pk=self.kwargs["pk"]).first()
+            if obj is None:
+                raise SubmissionAlreadyReviewed
+            return obj
+
+        obj = queryset.first()
         if obj is None:
             raise NoUnreviewedSubmissions
         return obj
 
-    def get(self, request, *args, **kwargs):
+    def dispatch(self, request, *args, **kwargs):
         try:
-            resp = super().get(request, *args, **kwargs)
+            return super().dispatch(request, *args, **kwargs)
         except NoActiveGameError:
-            resp = render(request, "misterx/no_active_game.html")
+            return render(request, "misterx/no_active_game.html", {"for_staff": True})
         except NoUnreviewedSubmissions:
-            resp = render(request, "misterx/no_unreviewed_submissions.html")
-        return resp
+            return render(request, "misterx/no_unreviewed_submissions.html")
+        except SubmissionAlreadyReviewed:
+            return render(request, "misterx/submission_already_reviewed.html")
+
+    # Decisions always have to name the reviewed submission, see get_object()
+    def post(self, request, *args, **kwargs):
+        if "pk" not in kwargs:
+            return self.http_method_not_allowed(request, *args, **kwargs)
+        with transaction.atomic():
+            return super().post(request, *args, **kwargs)
 
     # Cycle back to the same view every time
     def get_success_url(self):
@@ -316,7 +345,7 @@ class PlayerDetailView(LoginRequiredMixin, PermissionRequiredMixin, MultiTableMi
     tables = PlayerGroupTable, GameTable
 
     def get_tables_data(self):
-        groups = PlayerGroupFilter(self.request.GET, self.get_object().groups.all(), prefix="groups")
+        groups = PlayerGroupFilter(self.request.GET, PlayerGroup.objects.filter(user=self.object), prefix="groups")
         games = GameFilter(self.request.GET, Game.objects.filter(groups__in=groups.qs), prefix="games")
         self.filters = groups, games
         return groups.qs, games.qs
@@ -363,8 +392,8 @@ class PlayerGroupDetailView(LoginRequiredMixin, PermissionRequiredMixin, MultiTa
     tables = PlayerTable, GameTable
 
     def get_tables_data(self):
-        users = PlayerFilter(self.request.GET, self.get_object().user_set.all(), prefix="player")
-        games = GameFilter(self.request.GET, self.get_object().games.all(), prefix="games")
+        users = PlayerFilter(self.request.GET, Player.objects.filter(groups=self.object), prefix="player")
+        games = GameFilter(self.request.GET, self.object.games.all(), prefix="games")
         self.filters = users, games
         return users.qs, games.qs
 
@@ -381,28 +410,17 @@ class PlayerGroupDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteV
     template_name = "generic/object_confirm_delete.html"
 
 
-class UserSubmissionView(LoginRequiredMixin, InitialCreateView):
+class UserSubmissionView(LoginRequiredMixin, PlayerGameMixin, InitialCreateView):
     model = Submission
     template_name = "generic/object_create.html"
     form_class = UserSubmissionForm
 
-    def get_initial(self):
-        initial = super().get_initial()
-        groups = self.request.user.groups.all()
-        try:
-            game = Game.objects.filter(groups__in=groups).get(active=True)
-        except ObjectDoesNotExist:
-            raise NoActiveGameError()
-        group = game.groups.intersection(groups).first()
-        initial.update({"game": game.pk, "submitter": self.request.user.pk, "group": group.pk})
-        return initial
-
-    def get(self, request, *args, **kwargs):
-        try:
-            resp = super().get(request, *args, **kwargs)
-        except NoActiveGameError:
-            resp = render(request, "misterx/no_active_game.html")
-        return resp
+    # The player only chooses the task, everything else about the submission is set here
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        game, group = self.get_game_and_group()
+        kwargs["instance"] = Submission(game=game, group=group, submitter_id=self.request.user.pk)
+        return kwargs
 
     def get_success_url(self):
         return reverse_lazy("misterx:user-submission-list")
@@ -414,29 +432,17 @@ class UserSubmissionView(LoginRequiredMixin, InitialCreateView):
         return ret
 
 
-class UserSubmissionListView(LoginRequiredMixin, SingleTableMixin, FilterView):
+class UserSubmissionListView(LoginRequiredMixin, PlayerGameMixin, SingleTableMixin, FilterView):
     model = Submission
     table_class = UserSubmissionTable
     template_name = "misterx/user_submission_list.html"
     filterset_class = UserSubmissionFilter
 
     def get_queryset(self):
-        groups = self.request.user.groups.all()
-        try:
-            game = Game.objects.filter(groups__in=groups).get(active=True)
-        except ObjectDoesNotExist:
-            raise NoActiveGameError()
-        group = game.groups.intersection(groups).first()
+        game, group = self.get_game_and_group()
         qs = super().get_queryset()
         qs = qs.filter(game=game, group=group)
         return qs
-
-    def get(self, request, *args, **kwargs):
-        try:
-            resp = super().get(request, *args, **kwargs)
-        except NoActiveGameError:
-            resp = render(request, "misterx/no_active_game.html")
-        return resp
 
 
 class UserSubmissionDetailView(LoginRequiredMixin, SingleTableMixin, DetailView):
@@ -445,7 +451,7 @@ class UserSubmissionDetailView(LoginRequiredMixin, SingleTableMixin, DetailView)
     template_name = "misterx/user_submission_detail.html"
 
     def get_table_data(self):
-        obj = self.get_object()
+        obj = self.object
         own_submissions = Submission.objects.filter(game=obj.game, task=obj.task, group=obj.group).exclude(pk=obj.pk)
         own_submissions_filter = UserSubmissionFilter(self.request.GET, own_submissions, prefix="own")
         self.filter = own_submissions_filter
@@ -462,19 +468,14 @@ class UserSubmissionDetailView(LoginRequiredMixin, SingleTableMixin, DetailView)
         return super().get(request, *args, **kwargs)
 
 
-class UserTaskListView(LoginRequiredMixin, SingleTableMixin, FilterView):
+class UserTaskListView(LoginRequiredMixin, PlayerGameMixin, SingleTableMixin, FilterView):
     model = Task
     table_class = UserTaskTable
-    template_name = "misterx/task_list.html"
+    template_name = "misterx/user_task_list.html"
     filterset_class = UserTaskFilter
 
     def get_queryset(self):
-        groups = self.request.user.groups.all()
-        try:
-            game = Game.objects.filter(groups__in=groups).get(active=True)
-        except ObjectDoesNotExist:
-            raise NoActiveGameError()
-        group = game.groups.intersection(groups).first()
+        game, group = self.get_game_and_group()
         qs = (
             super()
             .get_queryset()
@@ -484,21 +485,10 @@ class UserTaskListView(LoginRequiredMixin, SingleTableMixin, FilterView):
                     OrderedTask.objects.filter(game=game, task__pk=models.OuterRef("pk")).values("task_number")
                 )
             )
-            .annotate(
-                completed=models.Subquery(
-                    models.Exists(Submission.objects.filter(game=game, group=group, task__pk=models.OuterRef("pk")))
-                )
-            )
-            .order_by("completed", "task_number")
+            .annotate(submitted=models.Exists(Submission.objects.filter(game=game, group=group, task__pk=models.OuterRef("pk"))))
+            .order_by("submitted", "task_number")
         )
         return qs
-
-    def get(self, request, *args, **kwargs):
-        try:
-            resp = super().get(request, *args, **kwargs)
-        except NoActiveGameError:
-            resp = render(request, "misterx/no_active_game.html")
-        return resp
 
 
 def serve_proofs(request, *args, **kwargs):
@@ -508,17 +498,13 @@ def serve_proofs(request, *args, **kwargs):
         try:
             upload = Upload.objects.get(file=request.path.removeprefix(settings.MEDIA_URL))
         except ObjectDoesNotExist:
-            return HttpResponse(status=403)
+            raise PermissionDenied()
 
         # Check if user is in the group of the submission or if they are staff
         # Otherwise return 403
         allowed_group = upload.submission.group
-        if allowed_group in user.groups.all():
-            pass
-        elif user.is_staff:
-            pass
-        else:
-            return HttpResponse(status=403)
+        if allowed_group not in user.groups.all() and not user.is_staff:
+            raise PermissionDenied()
 
         # Finally, serve the file
         if settings.DEBUG:
@@ -529,4 +515,4 @@ def serve_proofs(request, *args, **kwargs):
             response["X-Accel-Redirect"] = "/protected_media/" + request.path
             return response
     else:
-        return HttpResponse(status=403)
+        raise PermissionDenied()

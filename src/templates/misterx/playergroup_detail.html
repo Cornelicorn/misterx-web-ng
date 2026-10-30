@@ -7,8 +7,14 @@
 {% endblock page-pretitle %}
 
 {% block object_buttons %}
-    <a href="{% url "misterx:playergroup-edit" object.id %}" class="btn btn-warning">{% trans "Edit" %}</a>
-    <a href="{% url "misterx:playergroup-delete" object.id %}" class="btn btn-danger">{% trans "Delete" %}</a>
+    <a href="{% url "misterx:playergroup-edit" object.id %}" class="btn btn-warning">
+        <i class="ti ti-pencil me-2"></i>
+        {% trans "Edit" %}
+    </a>
+    <a href="{% url "misterx:playergroup-delete" object.id %}" class="btn btn-danger">
+        <i class="ti ti-trash me-2"></i>
+        {% trans "Delete" %}
+    </a>
 {% endblock object_buttons %}
 
 {% block specific_content %}
@@ -26,7 +32,7 @@
                 </div>
                 <div class="datagrid-item">
                     <div class="datagrid-title">{% trans "Players" %}</div>
-                    <div class="datagrid-content">{{ object.user_set.all |join:"," }}</div>
+                    <div class="datagrid-content">{{ object.user_set.all | join:", " }}</div>
                 </div>
             </div>
         </div>

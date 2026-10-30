@@ -1,3 +1,4 @@
+from django.utils.translation import gettext_lazy as _
 from django_filters import CharFilter, ChoiceFilter, FilterSet
 
 from .forms import FilterForm
@@ -43,7 +44,7 @@ class UserTaskFilter(FilterSet):
 
 
 class SubmissionFilter(FilterSet):
-    accepted = ChoiceFilter(null_label="Unreviewed", choices=((True, "Yes"), (False, "No")))
+    accepted = ChoiceFilter(null_label=_("Unreviewed"), choices=((True, _("Yes")), (False, _("No"))))
     explanation = CharFilter(lookup_expr="icontains")
     feedback = CharFilter(lookup_expr="icontains")
 
@@ -97,7 +98,7 @@ class PlayerGroupFilter(FilterSet):
 
 
 class UserSubmissionFilter(FilterSet):
-    accepted = ChoiceFilter(null_label="Unreviewed", choices=((True, "Yes"), (False, "No")))
+    accepted = ChoiceFilter(null_label=_("Unreviewed"), choices=((True, _("Yes")), (False, _("No"))))
     explanation = CharFilter(lookup_expr="icontains")
     feedback = CharFilter(lookup_expr="icontains")
 

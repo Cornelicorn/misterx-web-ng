@@ -4,7 +4,8 @@ from crispy_forms.layout import Submit
 from django import forms
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.db.models import Count, OuterRef, Subquery
+from django.db.models import Count
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from utilities.templatetags.utilities_media import get_main_mime_type
@@ -15,19 +16,14 @@ from .models import Game, OrderedTask, Player, PlayerGroup, Submission, Task
 class TaskSelectWidget(forms.SelectMultiple):
     template_name = "generic/task_select_widget.html"
 
-    def __init__(self, *args, game=None, **kwargs):
-        self.game = game
-        super().__init__(*args, **kwargs)
-
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
-        if self.game.pk:
-            selected = self.game.tasks.annotate(
-                task_number=Subquery(OrderedTask.objects.filter(game=self.game, task__pk=OuterRef("pk")).values("task_number"))
-            ).order_by("task_number")
-        else:
-            selected = Task.objects.none()
-        unselected = Task.objects.exclude(id__in=selected.values_list("id", flat=True))
+        # Show the selected tasks in the order of the value, which is the order of the saved game or,
+        # if the form is shown again because it was invalid, the submitted order
+        selected_ids = [int(pk) for pk in context["widget"]["value"] if pk.isdigit()]
+        tasks = Task.objects.in_bulk(selected_ids)
+        selected = [tasks[pk] for pk in selected_ids if pk in tasks]
+        unselected = Task.objects.exclude(id__in=tasks.keys())
         context["widget"].update({"selected_tasks": selected, "unselected_tasks": unselected})
         return context
 
@@ -41,13 +37,18 @@ class MultipleFileField(forms.FileField):
         kwargs.setdefault("widget", MultipleFileInput())
         super().__init__(*args, **kwargs)
 
-    def single_file_clean(self, data, inital):
+    def single_file_clean(self, data, initial):
         mime_type = get_main_mime_type(data)
         if mime_type not in settings.ALLOWED_UPLOADS:
             raise ValidationError(_("The file type {mime_type} is not supported.").format(mime_type=mime_type))
-        return super().clean(data, inital)
+        return super().clean(data, initial)
 
     def clean(self, data, initial=None):
+        # Without any files the single file checks never run, so check required here
+        if not data:
+            if self.required:
+                raise ValidationError(self.error_messages["required"], code="required")
+            return []
         if isinstance(data, list | tuple):
             result = [self.single_file_clean(d, initial) for d in data]
         else:
@@ -69,10 +70,12 @@ class GameForm(forms.ModelForm):
         self.helper = FormHelper()
         self.helper.form_id = "id_gameForm"
         self.helper.form_method = "post"
-        self.helper.title = "Game"
+        self.helper.title = _("Game")
         self.helper.add_input(Submit("save", _("Save")))
 
-        self.fields["tasks"].widget = TaskSelectWidget(game=self.instance)
+        self.fields["tasks"].widget = TaskSelectWidget()
+        if self.instance.pk:
+            self.initial["tasks"] = list(OrderedTask.objects.filter(game=self.instance).values_list("task_id", flat=True))
 
     def save(self, commit=True):
         # Save the game first including all m2m relationships
@@ -102,10 +105,13 @@ class GameForm(forms.ModelForm):
     # Check if any user is present in multiple of the selected groups
     def clean_groups(self):
         groups = self.cleaned_data["groups"]
-        if duplicates := groups.values_list("user").annotate(occurences=Count("id")).exclude(occurences=1):
+        duplicates = (
+            groups.filter(user__isnull=False).values_list("user").annotate(occurrences=Count("id")).exclude(occurrences=1)
+        )
+        if duplicates:
             raise ValidationError(
                 _("These users are present in multiple groups: {users}").format(
-                    users=", ".join(str(Player.objects.get(pk=id)) for id, _ in duplicates)
+                    users=", ".join(str(Player.objects.get(pk=user_id)) for user_id, _count in duplicates)
                 )
             )
         return groups
@@ -117,7 +123,7 @@ class TaskForm(forms.ModelForm):
         self.helper = FormHelper()
         self.helper.form_id = "id_taskForm"
         self.helper.form_method = "post"
-        self.helper.title = "Task"
+        self.helper.title = _("Task")
         self.helper.add_input(Submit("save", _("Save")))
 
     class Meta:
@@ -135,7 +141,7 @@ class SubmissionForm(forms.ModelForm):
         self.helper = FormHelper()
         self.helper.form_id = "id_submissionForm"
         self.helper.form_method = "post"
-        self.helper.title = "Submission"
+        self.helper.title = _("Submission")
         self.helper.add_input(Submit("save", _("Save")))
 
     class Meta:
@@ -158,7 +164,9 @@ class SubmissionApproveForm(SubmissionForm):
         self.helper = FormHelper()
         self.helper.form_id = "id_submissionApproveForm"
         self.helper.form_method = "post"
-        self.helper.title = "Submission"
+        # Post the decision for this submission, not for whatever is first in line when submitting
+        self.helper.form_action = reverse("misterx:submission-approve", kwargs={"pk": self.instance.pk})
+        self.helper.title = _("Submission")
         self.helper.add_input(Submit("deny", _("Deny"), css_class="btn btn-danger w-25"))
         self.helper.add_input(Submit("accept", _("Accept"), css_class="btn btn-success w-25 float-end"))
 
@@ -203,7 +211,7 @@ class PlayerForm(forms.ModelForm):
         self.helper = FormHelper()
         self.helper.form_id = "id_playerForm"
         self.helper.form_method = "post"
-        self.helper.title = "Player"
+        self.helper.title = _("Player")
         self.helper.add_input(Submit("save", _("Save")))
 
     class Meta:
@@ -218,10 +226,13 @@ class PlayerForm(forms.ModelForm):
 
     def clean_groups(self):
         data = self.cleaned_data["groups"]
-        if duplicates := data.values_list("games").annotate(occurences=Count("id")).exclude(occurences=1):
+        duplicates = (
+            data.filter(games__isnull=False).values_list("games").annotate(occurrences=Count("id")).exclude(occurrences=1)
+        )
+        if duplicates:
             raise ValidationError(
                 _("The selected groups conflict in these games: {games}").format(
-                    games=", ".join(str(Game.objects.get(pk=id)) for id, _ in duplicates)
+                    games=", ".join(str(Game.objects.get(pk=game_id)) for game_id, _count in duplicates)
                 )
             )
         return data
@@ -233,7 +244,7 @@ class PlayerGroupForm(forms.ModelForm):
         self.helper = FormHelper()
         self.helper.form_id = "id_playerGroupForm"
         self.helper.form_method = "post"
-        self.helper.title = "Playergroup"
+        self.helper.title = _("Playergroup")
         self.helper.add_input(Submit("save", _("Save")))
 
     class Meta:
@@ -248,14 +259,18 @@ class UserSubmissionForm(SubmissionForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for field in "game", "group", "accepted", "submitter", "points_override", "feedback":
-            self.fields[field].widget = forms.HiddenInput()
 
-        # Limit displayed tasks to the tasks in the given game
-        game = Game.objects.get(pk=kwargs.get("initial").get("game"))
+        # Limit displayed tasks to the tasks in the game of the submission
+        game = self.instance.game
         self.fields["task"].choices = (
             (t.task.id, str(t)) for t in OrderedTask.objects.filter(game=game, task__in=game.tasks.all())
         )
 
-    def clean_accepted(self):
-        return False
+    # Game, group and submitter are set by the view and new submissions stay unreviewed, they must not
+    # be form fields, as players could change them in the submitted data otherwise.
+    class Meta:
+        model = Submission
+        fields = [
+            "task",
+            "explanation",
+        ]
