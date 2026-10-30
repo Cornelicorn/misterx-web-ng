@@ -30,7 +30,10 @@
 
     {% if use_sso %}
         <section class="alternative-login-section">
-            <a href="{% url "social:begin" "oidc" %}">Volucra SSO</a>
+            <form method="post" action="{% url "social:begin" "oidc" %}">
+                {% csrf_token %}
+                <input type="submit" value="Volucra SSO">
+            </form>
         </section>
     {% endif %}
 {% endblock content %}
