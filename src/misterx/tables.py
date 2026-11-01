@@ -64,7 +64,7 @@ class TaskTable(tables.Table):
 
 
 class OrderedTaskTable(TaskTable):
-    task_number = tables.Column(attrs={"th": {"class": "w-1"}})
+    task_number = tables.Column(verbose_name=_("Task number"), attrs={"th": {"class": "w-1"}})
 
     class Meta:
         model = Task
@@ -79,8 +79,8 @@ class OrderedTaskTable(TaskTable):
 
 
 class UserTaskTable(tables.Table):
-    task_number = tables.Column(attrs={"th": {"class": "w-1"}})
-    submitted = tables.BooleanColumn()
+    task_number = tables.Column(verbose_name=_("Task number"), attrs={"th": {"class": "w-1"}})
+    submitted = tables.BooleanColumn(verbose_name=_("Submitted"))
     add = AddSubmissionForTaskColumn()
 
     class Meta:
@@ -96,7 +96,7 @@ class UserTaskTable(tables.Table):
 class SubmissionTable(tables.Table):
     open = OpenColumn("misterx:submission-detail")
     edit = EditColumn("misterx:submission-edit")
-    granted_points = tables.Column(orderable=False)
+    granted_points = tables.Column(verbose_name=_("Granted points"), orderable=False)
 
     class Meta:
         model = Submission
@@ -154,7 +154,7 @@ class GamePlayerGroupTable(tables.Table):
 
 class UserSubmissionTable(tables.Table):
     open = OpenColumn("misterx:user-submission-detail")
-    granted_points = tables.Column(orderable=False)
+    granted_points = tables.Column(verbose_name=_("Granted points"), orderable=False)
 
     class Meta:
         model = Submission

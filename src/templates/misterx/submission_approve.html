@@ -11,8 +11,15 @@
     {% trans "Review" %}
 {% endblock page-pretitle %}
 
+{% block alerts %}
+    {% include "misterx/includes/multiple_groups_warning.html" %}
+{% endblock alerts %}
+
 {% block specific_content %}
     <div class="card mb-4">
+        <div class="card-header">
+            <h2 class="card-title">{% trans "Submission information" %}</h2>
+        </div>
         <div class="card-body">
             <div class="datagrid">
                 <div class="datagrid-item">
@@ -24,20 +31,31 @@
                     <div class="datagrid-content">{{ object.task }}</div>
                 </div>
                 <div class="datagrid-item">
-                    <div class="datagrid-title">{% trans "Submission Time" %}</div>
-                    <div class="datagrid-content">{% blocktrans with time=object.time|timesince %}{{ time }} ago{% endblocktrans %}</div>
+                    <div class="datagrid-title">{% trans "Submitter" %}</div>
+                    <div class="datagrid-content">{{ object.submitter | default:"—" }}</div>
+                </div>
+                <div class="datagrid-item">
+                    <div class="datagrid-title">{% trans "Time" %}</div>
+                    <div class="datagrid-content" title="{{ object.time }}">
+                        {% blocktrans with time=object.time|timesince %}{{ time }} ago{% endblocktrans %}
+                    </div>
                 </div>
             </div>
-            <hr />
-            {% crispy form form.helper %}
         </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h2 class="card-title">{% trans "Decision" %}</h2>
+        </div>
+        <div class="card-body">{% crispy form form.helper %}</div>
     </div>
 
     {% include "misterx/includes/submission_content.html" %}
 
     {% trans "This group has only submitted this task once." as empty_title %}
     {% trans "If you didn't accept it, wait for the group to submit it again." as empty_subtitle %}
-    {% trans "Other Submissions by this group" as table_heading %}
+    {% trans "Other submissions by this group" as table_heading %}
     {% include "tables/table_card.html" with table=tables.0 filter=filters.0 id_filter_modal="id_filter_own" %}
 
     {% trans "Other groups haven't submitted this task yet." as empty_title %}

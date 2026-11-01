@@ -16,9 +16,7 @@
 {% block specific_content %}
     <div class="card mb-4">
         <div class="card-header">
-            <h3 class="card-title">
-                <strong>{% trans "Submission information" %}</strong>
-            </h3>
+            <h2 class="card-title">{% trans "Submission information" %}</h2>
         </div>
         <div class="card-body">
             <div class="datagrid">
@@ -27,12 +25,16 @@
                     <div class="datagrid-content">{{ object.task }}</div>
                 </div>
                 <div class="datagrid-item">
+                    <div class="datagrid-title">{% trans "Submitter" %}</div>
+                    <div class="datagrid-content">{{ object.submitter | default:"—" }}</div>
+                </div>
+                <div class="datagrid-item">
                     <div class="datagrid-title">{% trans "Time" %}</div>
                     <div class="datagrid-content">{{ object.time }}</div>
                 </div>
                 <div class="datagrid-item">
                     <div class="datagrid-title">{% trans "Accepted" %}</div>
-                    <div class="datagrid-content">{{ object.accepted | yesno:_("Yes,No,Not yet reviewed") }}</div>
+                    <div class="datagrid-content">{{ object.accepted | yesno:_("Yes,No,Unreviewed") }}</div>
                 </div>
                 <div class="datagrid-item">
                     <div class="datagrid-title">{% trans "Granted points" %}</div>
@@ -46,7 +48,7 @@
 
     {% trans "You have only submitted this task once." as empty_title %}
     {% trans "If we didn't accept it, submit it again." as empty_subtitle %}
-    {% trans "Other Submissions by your group for this task" as table_heading %}
+    {% trans "Other submissions by your group for this task" as table_heading %}
     {% include "tables/table_card.html" with id_filter_modal="id_filter_own" %}
 
 {% endblock specific_content %}

@@ -4,3 +4,8 @@
 {% block page-title %}
     {% trans "Tasks" %}
 {% endblock page-title %}
+
+{% block table %}
+    {% trans "Try adjusting the filters." as empty_subtitle %}
+    {{ block.super }}
+{% endblock table %}
