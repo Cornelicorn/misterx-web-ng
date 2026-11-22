@@ -1,5 +1,5 @@
 version = 1
-revision = 5
+revision = 3
 requires-python = ">=3.11"
 resolution-markers = [
     "python_full_version >= '3.15'",
@@ -876,6 +876,7 @@ dependencies = [
     { name = "python-magic" },
     { name = "social-auth-app-django" },
     { name = "uwsgi" },
+    { name = "volucra-django-base" },
 ]
 
 [package.dev-dependencies]
@@ -900,6 +901,7 @@ requires-dist = [
     { name = "python-magic", specifier = ">=0.4.27" },
     { name = "social-auth-app-django", specifier = ">=5.4.3" },
     { name = "uwsgi", specifier = ">=2.0.28" },
+    { name = "volucra-django-base", git = "https://github.com/Cornelicorn/volucra-django-base?rev=4d8f47a9d9e65845af8085bab178f2503a6d67fc" },
 ]
 
 [package.metadata.requires-dev]
@@ -1416,3 +1418,16 @@ name = "uwsgi"
 version = "2.0.31"
 source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/9f/49/2f57640e889ba509fd1fae10cccec1b58972a07c2724486efba94c5ea448/uwsgi-2.0.31.tar.gz", hash = "sha256:e8f8b350ccc106ff93a65247b9136f529c14bf96b936ac5b264c6ff9d0c76257", size = 822796, upload-time = "2025-10-11T19:17:28.794Z" }
+
+[[package]]
+name = "volucra-django-base"
+version = "0.1.0"
+source = { git = "https://github.com/Cornelicorn/volucra-django-base?rev=4d8f47a9d9e65845af8085bab178f2503a6d67fc#4d8f47a9d9e65845af8085bab178f2503a6d67fc" }
+dependencies = [
+    { name = "crispy-bootstrap5" },
+    { name = "django", version = "5.2.18", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "django", version = "6.1.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+    { name = "django-crispy-forms" },
+    { name = "django-filter" },
+    { name = "django-tables2" },
+]

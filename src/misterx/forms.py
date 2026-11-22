@@ -8,9 +8,8 @@ from django.db.models import Count
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from utilities.templatetags.utilities_media import get_main_mime_type
-
 from .models import Game, OrderedTask, Player, PlayerGroup, Submission, Task
+from .templatetags.misterx_media import get_main_mime_type
 
 
 def get_task_choices(game: Game) -> list[tuple[int, str]]:
@@ -18,7 +17,7 @@ def get_task_choices(game: Game) -> list[tuple[int, str]]:
 
 
 class TaskSelectWidget(forms.SelectMultiple):
-    template_name = "generic/task_select_widget.html"
+    template_name = "misterx/task_select_widget.html"
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
@@ -66,14 +65,6 @@ class MultipleFileField(forms.FileField):
         else:
             result = [self.single_file_clean(data, initial)]
         return result
-
-
-class FilterForm(forms.Form):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_method = "get"
-        self.helper.add_input(Submit("submit", _("Filter"), css_class="w-100"))
 
 
 class GameForm(forms.ModelForm):

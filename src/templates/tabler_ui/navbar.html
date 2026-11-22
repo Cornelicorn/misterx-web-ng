@@ -1,0 +1,66 @@
+{% extends "tabler_ui/navbar.html" %}
+
+{% load i18n %}
+{% load tabler_ui %}
+
+{% block navbar_brand %}
+    {% if user.is_staff %}
+        <a class="navbar-brand" href="{% url "misterx:submission-approve" %}">Mister X</a>
+    {% else %}
+        <a class="navbar-brand" href="{% url "misterx:user-submission-create" %}">Mister X</a>
+    {% endif %}
+{% endblock navbar_brand %}
+
+{% block navbar_menu %}
+    {% comment %}Highlight the menu entry of the section the current page belongs to, e.g. also on detail pages{% endcomment %}
+    {% with path=request.path %}
+        {% if user.is_staff %}
+            {% url "misterx:submission-approve" as review_url %}
+            {% url "misterx:game-list" as games_url %}
+            {% url "misterx:task-list" as tasks_url %}
+            {% url "misterx:submission-list" as submissions_url %}
+            {% url "misterx:player-list" as players_url %}
+            {% url "misterx:playergroup-list" as playergroups_url %}
+            <li class="nav-item
+                       {% if path|startswith:review_url %}active" aria-current="true{% endif %}">
+                <a href="{{ review_url }}" class="nav-link">{% trans "Review Submissions" %}</a>
+            </li>
+            <li class="nav-item
+                       {% if path|startswith:games_url %}active" aria-current="true{% endif %}">
+                <a href="{{ games_url }}" class="nav-link">{% trans "Games List" %}</a>
+            </li>
+            <li class="nav-item
+                       {% if path|startswith:tasks_url %}active" aria-current="true{% endif %}">
+                <a href="{{ tasks_url }}" class="nav-link">{% trans "Tasks List" %}</a>
+            </li>
+            <li class="nav-item
+                       {% if path|startswith:submissions_url and not path|startswith:review_url %}active" aria-current="true{% endif %}">
+                <a href="{{ submissions_url }}" class="nav-link">{% trans "Submissions List" %}</a>
+            </li>
+            <li class="nav-item
+                       {% if path|startswith:players_url %}active" aria-current="true{% endif %}">
+                <a href="{{ players_url }}" class="nav-link">{% trans "Players List" %}</a>
+            </li>
+            <li class="nav-item
+                       {% if path|startswith:playergroups_url %}active" aria-current="true{% endif %}">
+                <a href="{{ playergroups_url }}" class="nav-link">{% trans "Playergroups List" %}</a>
+            </li>
+        {% else %}
+            {% url "misterx:user-task-list" as user_tasks_url %}
+            {% url "misterx:user-submission-create" as user_submit_url %}
+            {% url "misterx:user-submission-list" as user_submissions_url %}
+            <li class="nav-item
+                       {% if path|startswith:user_tasks_url %}active" aria-current="true{% endif %}">
+                <a href="{{ user_tasks_url }}" class="nav-link">{% trans "List Tasks" %}</a>
+            </li>
+            <li class="nav-item
+                       {% if path|startswith:user_submit_url %}active" aria-current="true{% endif %}">
+                <a href="{{ user_submit_url }}" class="nav-link">{% trans "Submit a Task" %}</a>
+            </li>
+            <li class="nav-item
+                       {% if path|startswith:user_submissions_url %}active" aria-current="true{% endif %}">
+                <a href="{{ user_submissions_url }}" class="nav-link">{% trans "List Submissions" %}</a>
+            </li>
+        {% endif %}
+    {% endwith %}
+{% endblock navbar_menu %}

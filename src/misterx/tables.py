@@ -1,37 +1,18 @@
 import django_tables2 as tables
 from django.utils.translation import gettext_lazy as _
-
-from utilities.tables.columns import EditColumn, OpenColumn
+from tabler_ui.tables import ButtonColumn, EditColumn, OpenColumn
 
 from .models import Game, Player, PlayerGroup, Submission, Task
 
 
-class AddSubmissionForGroupColumn(tables.TemplateColumn):
+class AddSubmissionForGroupColumn(ButtonColumn):
     def __init__(self, verbose_name: str = _("Add Submission")):
-        super().__init__(
-            template_name="misterx/tables/columns/add_group_submission.html",
-            verbose_name=verbose_name,
-            attrs={
-                "td": {"align": "right"},
-                "th": {"style": "text-align: right;", "class": "w-1"},
-            },
-            orderable=False,
-        )
-        self.extra_context.update({"url_target": "misterx:game-submission-create"})
+        super().__init__("misterx/tables/columns/add_group_submission.html", "misterx:game-submission-create", verbose_name)
 
 
-class AddSubmissionForTaskColumn(tables.TemplateColumn):
+class AddSubmissionForTaskColumn(ButtonColumn):
     def __init__(self, verbose_name: str = _("Submit")):
-        super().__init__(
-            template_name="misterx/tables/columns/add_user_task_submission.html",
-            verbose_name=verbose_name,
-            attrs={
-                "td": {"align": "right"},
-                "th": {"style": "text-align: right;", "class": "w-1"},
-            },
-            orderable=False,
-        )
-        self.extra_context.update({"url_target": "misterx:user-submission-create"})
+        super().__init__("misterx/tables/columns/add_user_task_submission.html", "misterx:user-submission-create", verbose_name)
 
 
 class GameTable(tables.Table):

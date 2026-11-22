@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
+from tabler_ui import defaults as tabler_ui_defaults
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -49,6 +50,9 @@ ADMIN_GROUP = getattr(local_settings, "ADMIN_GROUP", "misterx_admins")
 # Application definition
 
 INSTALLED_APPS = [
+    # Before tabler_ui and django.contrib.admin, so their login pages show the SSO button of volucra_base
+    "volucra_base",
+    "tabler_ui",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -63,7 +67,6 @@ INSTALLED_APPS = [
     "crispy_forms",
     "crispy_bootstrap5",
     "social_django",
-    "utilities",
     "misterx",
 ]
 
@@ -95,7 +98,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "social_django.context_processors.backends",
                 "social_django.context_processors.login_redirect",
-                "utilities.context_processors.read_settings",
+                "volucra_base.context_processors.sso",
             ],
         },
     },
@@ -146,7 +149,7 @@ SOCIAL_AUTH_PIPELINE = (
     "social_core.pipeline.social_auth.associate_user",
     "social_core.pipeline.social_auth.load_extra_data",
     "social_core.pipeline.user.user_details",
-    "utilities.auth_pipeline.oidc.assign_groups_and_attributes",
+    "volucra_base.auth_pipeline.oidc.assign_groups_and_attributes",
 )
 
 # Redirect to the start page after login, which redirects players and staff to their respective start page
@@ -184,24 +187,18 @@ STATICFILES_DIRS = (BASE_DIR / "static-source",)
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-DJANGO_TABLES2_TEMPLATE = "django_tables2/bootstrap5-responsive.html"
+DJANGO_TABLES2_TEMPLATE = tabler_ui_defaults.DJANGO_TABLES2_TEMPLATE
 
-DJANGO_TABLES2_TABLE_ATTRS = {
-    "class": "table table-responsive table-striped",
-    "td": {
-        "class": "align-middle",
-    },
-    "th": {
-        "_ordering": {
-            "ascending": "ti ti-sort-ascending",
-            "descending": "ti ti-sort-descending",
-        },
-    },
-}
+DJANGO_TABLES2_TABLE_ATTRS = tabler_ui_defaults.DJANGO_TABLES2_TABLE_ATTRS
 
-CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_ALLOWED_TEMPLATE_PACKS = tabler_ui_defaults.CRISPY_ALLOWED_TEMPLATE_PACKS
 
-CRISPY_TEMPLATE_PACK = "bootstrap5"
+CRISPY_TEMPLATE_PACK = tabler_ui_defaults.CRISPY_TEMPLATE_PACK
+
+TABLER_UI_SITE_NAME = "Mister X"
+
+# Keep the theme players chose before it was saved in their preferences
+TABLER_UI_THEME_STORAGE_KEY = "misterx_theme"
 
 FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 

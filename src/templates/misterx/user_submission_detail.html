@@ -1,4 +1,4 @@
-{% extends "generic/object_detail.html" %}
+{% extends "tabler_ui/generic/object_detail.html" %}
 
 {% load i18n %}
 
@@ -49,6 +49,6 @@
     {% trans "You have only submitted this task once." as empty_title %}
     {% trans "If we didn't accept it, submit it again." as empty_subtitle %}
     {% trans "Other submissions by your group for this task" as table_heading %}
-    {% include "tables/table_card.html" with id_filter_modal="id_filter_own" %}
+    {% include "tabler_ui/tables/table_card.html" with id_filter_modal="id_filter_own" %}
 
 {% endblock specific_content %}
