@@ -15,6 +15,11 @@ commit it is pinned to is set in `[tool.uv.sources]` of `pyproject.toml`.
 The templates in `src/templates/tabler_ui` extend the ones of `tabler_ui` to
 add the navbar entries and the stylesheet of Mister X.
 
+Dependabot updates `uv.lock` weekly and raises the upper bounds of the
+dependencies when a new major version comes out. To resolve
+volucra-django-base it needs the Dependabot secret `VOLUCRA_DJANGO_BASE_TOKEN`,
+a token with read access to the contents of that repository.
+
 ## Example data
 
 `src/misterx/fixtures` contains example data for development: players and

@@ -5,27 +5,27 @@ description = "WebApp to use for running a MisterX game"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "crispy-bootstrap5>=2024.10",
-    "django>=5.1.7",
-    "django-crispy-forms>=2.3",
-    "django-debug-toolbar>=5.0.1",
-    "django-filter>=25.1",
-    "django-guardian>=2.4.0",
-    "django-tables2>=2.7.5",
-    "psycopg2-binary>=2.9.10",
-    "python-magic>=0.4.27",
-    "social-auth-app-django>=5.4.3",
-    "uwsgi>=2.0.28",
+    "crispy-bootstrap5>=2024.10,<2027",
+    "django>=5.1.7,<7",
+    "django-crispy-forms>=2.3,<3",
+    "django-debug-toolbar>=5.0.1,<9",
+    "django-filter>=25.1,<27",
+    "django-guardian>=2.4.0,<4",
+    "django-tables2>=2.7.5,<4",
+    "psycopg2-binary>=2.9.10,<3",
+    "python-magic>=0.4.27,<0.5",
+    "social-auth-app-django>=5.4.3,<8",
+    "uwsgi>=2.0.28,<3",
     "volucra-django-base",
 ]
 
 [dependency-groups]
 dev = [
-    "django-stubs[compatible-mypy]>=5.1.3",
-    "djhtml>=3.0.7",
-    "djlint>=1.36.4",
-    "mypy>=1.15.0",
-    "ruff>=0.9.10",
+    "django-stubs[compatible-mypy]>=5.1.3,<7",
+    "djhtml>=3.0.7,<4",
+    "djlint>=1.36.4,<2",
+    "mypy>=1.15.0,<3",
+    "ruff>=0.9.10,<0.18",
 ]
 
 [[tool.mypy.overrides]]
@@ -71,4 +71,4 @@ build-backend = "hatchling.build"
 packages = ["src/misterx", "src/misterx_root", "src/templates"]
 
 [tool.uv.sources]
-volucra-django-base = { git = "https://github.com/Cornelicorn/volucra-django-base", rev = "4d8f47a9d9e65845af8085bab178f2503a6d67fc" }
+volucra-django-base = { git = "https://github.com/Cornelicorn/volucra-django-base", rev = "e861cb0ee0c5501b267541f486c6d5bbc5c910c3" }
