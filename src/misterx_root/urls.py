@@ -27,6 +27,6 @@ urlpatterns = [
     path("i18n/", include("django.conf.urls.i18n")),
     path("admin/", admin.site.urls),
     path("accounts/", include("tabler_ui.account_urls")),
-    path("ui/", include("tabler_ui.urls")),
+    path("", include("volucra_base.urls")),
     path("", include("misterx.urls")),
 ] + debug_toolbar_urls()

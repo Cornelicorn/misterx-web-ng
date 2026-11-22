@@ -6,8 +6,9 @@ points and tasks as the leader of the game.
 ## Dependencies
 
 The layout, the generic pages, the theme switcher and the account pages come
-from the app `tabler_ui`, the SSO login from the app `volucra_base`. Both are
-in the private repository [volucra-django-base](https://github.com/Cornelicorn/volucra-django-base).
+from the app `tabler_ui`, the user preferences, which keep the theme of logged
+in users, and the SSO login from the app `volucra_base`. Both are in the
+private repository [volucra-django-base](https://github.com/Cornelicorn/volucra-django-base).
 `uv sync` installs it from GitHub, so the machine needs read access to that
 repository, e.g. through an SSH key or a token in the git credentials. The
 commit it is pinned to is set in `[tool.uv.sources]` of `pyproject.toml`.
