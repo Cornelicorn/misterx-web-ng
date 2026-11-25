@@ -16,10 +16,14 @@ commit it is pinned to is set in `[tool.uv.sources]` of `pyproject.toml`.
 The templates in `src/templates/tabler_ui` extend the ones of `tabler_ui` to
 add the navbar entries and the stylesheet of Mister X.
 
-Dependabot updates `uv.lock` weekly and raises the upper bounds of the
-dependencies when a new major version comes out. To resolve
-volucra-django-base it needs the Dependabot secret `VOLUCRA_DJANGO_BASE_TOKEN`,
-a token with read access to the contents of that repository.
+Mister X needs Python 3.12 (Ubuntu 24.04) or newer. Dependabot updates
+`uv.lock` weekly. The lower bound of each dependency is the version Mister X
+is tested with, the upper bound the next version which may break it according
+to the versioning of that project, see the dependency updates in the README of
+volucra-django-base. Dependabot raises it when a version beyond it comes out.
+To resolve volucra-django-base it needs the Dependabot secret
+`VOLUCRA_DJANGO_BASE_TOKEN`, a token with read access to the contents of that
+repository.
 
 ## Example data
 
