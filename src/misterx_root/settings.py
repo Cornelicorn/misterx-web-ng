@@ -197,9 +197,6 @@ CRISPY_TEMPLATE_PACK = tabler_ui_defaults.CRISPY_TEMPLATE_PACK
 
 TABLER_UI_SITE_NAME = "Mister X"
 
-# Keep the theme players chose before it was saved in their preferences
-TABLER_UI_THEME_STORAGE_KEY = "misterx_theme"
-
 FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
 MEDIA_ROOT = getattr(local_settings, "MEDIA_ROOT", BASE_DIR / "media")
