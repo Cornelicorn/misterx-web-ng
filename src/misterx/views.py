@@ -7,10 +7,9 @@ from django.urls import reverse_lazy
 from django.views.generic import DeleteView, DetailView, UpdateView
 from django.views.static import serve
 from django_filters.views import FilterView
-from django_tables2 import MultiTableMixin, SingleTableMixin
+from django_tables2 import SingleTableMixin
 from guardian.mixins import LoginRequiredMixin, PermissionListMixin, PermissionRequiredMixin
-
-from utilities.views import InitialCreateView
+from volucra_base.views import FilteredMultiTableMixin, InitialCreateView
 
 from .filters import (
     GameFilter,
@@ -108,25 +107,6 @@ class MultipleGroupsWarningMixin:
         return context
 
 
-class FilteredMultiTableMixin(MultiTableMixin):
-    """
-    Provides the filters of the tables to the template, get_tables_data() has to store them in self.filters.
-    The columns of fields left out of a filter with exclude are hidden as well, as they have the same value in
-    every row.
-    """
-
-    def get_tables(self):
-        tables = super().get_tables()
-        for table, filterset in zip(tables, self.filters):
-            table.exclude = (*table.exclude, *getattr(filterset, "excluded", ()))
-        return tables
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update({"filters": self.filters})
-        return context
-
-
 class RelatedSubmissionsMixin(FilteredMultiTableMixin):
     """
     Lists the other submissions of the group and the submissions of the other groups for the task of the submission
@@ -160,14 +140,14 @@ class GameCreateView(LoginRequiredMixin, PermissionRequiredMixin, InitialCreateV
     model = Game
     permission_required = "misterx.add_game"
     permission_object = None
-    template_name = "generic/object_create.html"
+    template_name = "tabler_ui/generic/object_create.html"
     form_class = GameForm
 
 
 class GameEditView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = Game
     permission_required = "misterx.change_game"
-    template_name = "generic/object_edit.html"
+    template_name = "tabler_ui/generic/object_edit.html"
     form_class = GameForm
 
 
@@ -202,7 +182,7 @@ class GameDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     model = Game
     permission_required = "misterx.delete_game"
     success_url = reverse_lazy("misterx:game-list")
-    template_name = "generic/object_confirm_delete.html"
+    template_name = "tabler_ui/generic/object_confirm_delete.html"
 
 
 class TaskListView(LoginRequiredMixin, PermissionListMixin, SingleTableMixin, FilterView):
@@ -217,14 +197,14 @@ class TaskCreateView(LoginRequiredMixin, PermissionRequiredMixin, InitialCreateV
     model = Task
     permission_required = "misterx.add_task"
     permission_object = None
-    template_name = "generic/object_create.html"
+    template_name = "tabler_ui/generic/object_create.html"
     form_class = TaskForm
 
 
 class TaskEditView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = Task
     permission_required = "misterx.change_task"
-    template_name = "generic/object_edit.html"
+    template_name = "tabler_ui/generic/object_edit.html"
     form_class = TaskForm
 
 
@@ -244,7 +224,7 @@ class TaskDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     model = Task
     permission_required = "misterx.delete_task"
     success_url = reverse_lazy("misterx:task-list")
-    template_name = "generic/object_confirm_delete.html"
+    template_name = "tabler_ui/generic/object_confirm_delete.html"
 
 
 class SubmissionListView(LoginRequiredMixin, PermissionListMixin, MultipleGroupsWarningMixin, SingleTableMixin, FilterView):
@@ -259,7 +239,7 @@ class SubmissionCreateView(LoginRequiredMixin, PermissionRequiredMixin, InitialC
     model = Submission
     permission_required = "misterx.add_submission"
     permission_object = None
-    template_name = "generic/object_create.html"
+    template_name = "tabler_ui/generic/object_create.html"
     form_class = SubmissionForm
 
 
@@ -281,7 +261,7 @@ class GameSubmissionCreateView(SubmissionCreateView):
 class SubmissionEditView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = Submission
     permission_required = "misterx.change_submission"
-    template_name = "generic/object_edit.html"
+    template_name = "tabler_ui/generic/object_edit.html"
     form_class = SubmissionForm
 
 
@@ -371,7 +351,7 @@ class SubmissionDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteVi
     model = Submission
     permission_required = "misterx.delete_submission"
     success_url = reverse_lazy("misterx:submission-list")
-    template_name = "generic/object_confirm_delete.html"
+    template_name = "tabler_ui/generic/object_confirm_delete.html"
 
 
 class PlayerListView(LoginRequiredMixin, PermissionListMixin, SingleTableMixin, FilterView):
@@ -386,14 +366,14 @@ class PlayerCreateView(LoginRequiredMixin, PermissionRequiredMixin, InitialCreat
     model = Player
     permission_required = "auth.add_user"
     permission_object = None
-    template_name = "generic/object_create.html"
+    template_name = "tabler_ui/generic/object_create.html"
     form_class = PlayerForm
 
 
 class PlayerEditView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = Player
     permission_required = "auth.change_user"
-    template_name = "generic/object_edit.html"
+    template_name = "tabler_ui/generic/object_edit.html"
     form_class = PlayerForm
 
 
@@ -413,7 +393,7 @@ class PlayerDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     model = Player
     permission_required = "auth.delete_user"
     success_url = reverse_lazy("misterx:player-list")
-    template_name = "generic/object_confirm_delete.html"
+    template_name = "tabler_ui/generic/object_confirm_delete.html"
 
 
 class PlayerGroupListView(LoginRequiredMixin, PermissionListMixin, SingleTableMixin, FilterView):
@@ -428,14 +408,14 @@ class PlayerGroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, Initial
     model = PlayerGroup
     permission_required = "auth.add_group"
     permission_object = None
-    template_name = "generic/object_create.html"
+    template_name = "tabler_ui/generic/object_create.html"
     form_class = PlayerGroupForm
 
 
 class PlayerGroupEditView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = PlayerGroup
     permission_required = "auth.change_group"
-    template_name = "generic/object_edit.html"
+    template_name = "tabler_ui/generic/object_edit.html"
     form_class = PlayerGroupForm
 
 
@@ -455,12 +435,12 @@ class PlayerGroupDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteV
     model = PlayerGroup
     permission_required = "auth.delete_group"
     success_url = reverse_lazy("misterx:playergroup-list")
-    template_name = "generic/object_confirm_delete.html"
+    template_name = "tabler_ui/generic/object_confirm_delete.html"
 
 
 class UserSubmissionView(LoginRequiredMixin, PlayerGameMixin, InitialCreateView):
     model = Submission
-    template_name = "generic/object_create.html"
+    template_name = "tabler_ui/generic/object_create.html"
     form_class = UserSubmissionForm
 
     # The player only chooses the task, everything else about the submission is set here
