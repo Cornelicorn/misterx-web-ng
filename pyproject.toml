@@ -71,4 +71,4 @@ build-backend = "hatchling.build"
 packages = ["src/misterx", "src/misterx_root", "src/templates"]
 
 [tool.uv.sources]
-volucra-django-base = { git = "https://github.com/Cornelicorn/volucra-django-base", rev = "a4229811c3f86e93787bf8ed946e3f2461ec24fb" }
+volucra-django-base = { git = "https://github.com/Cornelicorn/volucra-django-base", rev = "d7b5ae55cef631aaf68a9009b9a74c4678cd2426" }

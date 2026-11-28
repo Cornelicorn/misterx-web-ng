@@ -807,7 +807,7 @@ requires-dist = [
     { name = "python-magic", specifier = ">=0.4.27,<0.5" },
     { name = "social-auth-app-django", specifier = ">=7.2.0,<8" },
     { name = "uwsgi", specifier = ">=2.0.31,<2.1" },
-    { name = "volucra-django-base", git = "https://github.com/Cornelicorn/volucra-django-base?rev=a4229811c3f86e93787bf8ed946e3f2461ec24fb" },
+    { name = "volucra-django-base", git = "https://github.com/Cornelicorn/volucra-django-base?rev=d7b5ae55cef631aaf68a9009b9a74c4678cd2426" },
 ]
 
 [package.metadata.requires-dev]
@@ -1285,7 +1285,7 @@ sdist = { url = "https://files.pythonhosted.org/packages/9f/49/2f57640e889ba509f
 [[package]]
 name = "volucra-django-base"
 version = "0.1.0"
-source = { git = "https://github.com/Cornelicorn/volucra-django-base?rev=a4229811c3f86e93787bf8ed946e3f2461ec24fb#a4229811c3f86e93787bf8ed946e3f2461ec24fb" }
+source = { git = "https://github.com/Cornelicorn/volucra-django-base?rev=d7b5ae55cef631aaf68a9009b9a74c4678cd2426#d7b5ae55cef631aaf68a9009b9a74c4678cd2426" }
 dependencies = [
     { name = "crispy-bootstrap5" },
     { name = "django" },
