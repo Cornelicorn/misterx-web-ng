@@ -5,6 +5,6 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-    # Raise the upper bounds in pyproject.toml when a version beyond them comes out, versions within the bounds only
-    # update uv.lock
-    versioning-strategy: "widen"
+    # Raise the lower bound in pyproject.toml to the new version with each update, so it is the version Mister X is
+    # tested with, and the upper bound when the new version is beyond it
+    versioning-strategy: "increase"

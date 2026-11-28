@@ -20,7 +20,9 @@ Mister X needs Python 3.12 (Ubuntu 24.04) or newer. Dependabot updates
 `uv.lock` weekly. The lower bound of each dependency is the version Mister X
 is tested with, the upper bound the next version which may break it according
 to the versioning of that project, see the dependency updates in the README of
-volucra-django-base. Dependabot raises it when a version beyond it comes out.
+volucra-django-base. Each Dependabot update raises the lower bound to the new
+version, and the upper bound when the new version is beyond it
+(`versioning-strategy: increase`).
 
 ## Example data
 
